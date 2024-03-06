@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Shopping Buddy</string>
+    <string name="home">Home</string>
+    <string name="new_event">New Event</string>
+    <string name="event">Event</string>
+    <string name="history">History</string>
+    <string name="bookmark">Bookmark</string>
+    <string name="profile">Profile</string>
+    <string name="back_button">Back Button</string>
+    <string name="cat_batteries">Batteries</string>
+    <string name="cat_bakery">Bakery</string>
+    <string name="cat_fruits">Fruits</string>
+</resources>
