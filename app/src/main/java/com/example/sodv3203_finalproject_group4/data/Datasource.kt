@@ -23,8 +23,10 @@ object Datasource {
     val categoryList = listOf(
         EventCategory(1, R.string.cat_batteries),
         EventCategory(2, R.string.cat_bakery),
-        EventCategory(3, R.string.cat_fruits)
+        EventCategory(3, R.string.cat_fruits),
+        EventCategory(4, R.string.cat_others)
     )
+
 
     val eventList = listOf(
         Event(
@@ -57,7 +59,7 @@ object Datasource {
         ),
         Event(
             3,
-            1,  // Category ID
+            2,  // Category ID
             "Whole Grain Bread (2 Loaves)",  // Title
             "The Baker's Corner",
             3,
@@ -71,7 +73,7 @@ object Datasource {
         ),
         Event(
             4,
-            1,  // Category ID (Same as above)
+            2,  // Category ID (Same as above)
             "Organic Flour (5kg Bag)",
             "The Miller's Mill",
             2,
@@ -82,6 +84,63 @@ object Datasource {
             EventStatus.Available,
             false,
             R.drawable.img_event_9
-        )
+        ),
+        Event(
+            5,
+            3,  // Category ID (Same as above)
+            "Water Melon (10 Pcs)",
+            "Herron Mews",
+            2,
+            dateFormat.parse("2024-03-16"),
+            dateFormat.parse("2024-03-22"),
+            30.00,
+            "Sally",
+            EventStatus.Available,
+            false,
+            R.drawable.img_event_4
+        ),
+        Event(
+            6,
+            1,
+            "Duracell  2A x 60 pcs",
+            "Sage Hill",
+            3,
+            dateFormat.parse("2024-03-01"),
+            dateFormat.parse("2024-03-31"),
+            32.0,
+            "Bruce787",
+            EventStatus.Available,
+            false,
+            R.drawable.img_event_5
+        ),
+        Event(
+            7,
+            1,
+            "Duracell  2A x 60 pcs",
+            "Sage Hill",
+            3,
+            dateFormat.parse("2024-03-01"),
+            dateFormat.parse("2024-03-31"),
+            32.0,
+            "Bruce787",
+            EventStatus.Available,
+            false,
+            R.drawable.img_event_6
+        ),
+        Event(
+            8,
+            1,
+            "Duracell  2A x 60 pcs",
+            "Sage Hill",
+            3,
+            dateFormat.parse("2024-03-01"),
+            dateFormat.parse("2024-03-31"),
+            32.0,
+            "Bruce787",
+            EventStatus.Available,
+            false,
+            R.drawable.img_event_6
+        ),
+
     )
 }

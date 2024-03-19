@@ -10,4 +10,5 @@
     <string name="cat_batteries">Batteries</string>
     <string name="cat_bakery">Bakery</string>
     <string name="cat_fruits">Fruits</string>
+    <string name="cat_others" />
 </resources>
