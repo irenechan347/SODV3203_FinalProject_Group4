@@ -17,11 +17,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,13 +40,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.ShoppingBuddyScreen
 import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavHostController) {
     var searchText by remember { mutableStateOf("") }
 
     Column(
@@ -52,32 +56,49 @@ fun HomeScreen() {
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = { searchText = it },
+        Row (
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            placeholder = {
-                Text(
-                    text = "Search by product name",
-                    style = TextStyle(color = Color.Gray)
-                )
-            },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Gray,
-                unfocusedBorderColor = Color.LightGray
-            ),
-            singleLine = true,
-            shape = RoundedCornerShape(16.dp),
-            leadingIcon = {
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            IconButton(
+                onClick = { navController.navigate(ShoppingBuddyScreen.NewEvent.name) }
+            ) {
                 Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "New Event",
                     tint = Color.Gray
                 )
             }
-        )
+            OutlinedTextField(
+                value = searchText,
+                onValueChange = { searchText = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                placeholder = {
+                    Text(
+                        text = "Search by product name",
+                        style = TextStyle(color = Color.Gray)
+                    )
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.Gray,
+                    unfocusedBorderColor = Color.LightGray
+                ),
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = Color.Gray
+                    )
+                }
+            )
+        }
 
         val filteredEvents = Datasource.eventList.filter {
             it.productName.contains(searchText, ignoreCase = true)
@@ -143,6 +164,7 @@ fun EventItem(event: Event) {
 @Composable
 fun HomeScreenPreview() {
     ShoppingBuddyAppTheme {
-        HomeScreen()
+        val navController = rememberNavController()
+        HomeScreen(navController = navController)
     }
 }

@@ -190,7 +190,7 @@ fun ShoppingBuddyApp(
         ) {
             composable(route = ShoppingBuddyScreen.Home.name) {
                 // val context = LocalContext.current
-                HomeScreen()
+                HomeScreen(navController = navController)
             }
 
             composable(route = ShoppingBuddyScreen.NewEvent.name) {
