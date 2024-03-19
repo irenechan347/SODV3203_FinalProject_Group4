@@ -53,7 +53,35 @@ object Datasource {
             "Sally",
             EventStatus.Joined,
             true,
-            R.drawable.img_event_1
+            R.drawable.img_event_2
+        ),
+        Event(
+            3,
+            1,  // Category ID
+            "Whole Grain Bread (2 Loaves)",  // Title
+            "The Baker's Corner",
+            3,
+            dateFormat.parse("2024-03-10"),
+            dateFormat.parse("2024-03-20"),
+            5.00,
+            "JohnDoe",
+            EventStatus.Available,
+            false,
+            R.drawable.img_event_8
+        ),
+        Event(
+            4,
+            1,  // Category ID (Same as above)
+            "Organic Flour (5kg Bag)",
+            "The Miller's Mill",
+            2,
+            dateFormat.parse("2024-03-12"),
+            dateFormat.parse("2024-03-25"),
+            10.00,
+            "JaneSmith",
+            EventStatus.Available,
+            false,
+            R.drawable.img_event_9
         )
     )
 }
