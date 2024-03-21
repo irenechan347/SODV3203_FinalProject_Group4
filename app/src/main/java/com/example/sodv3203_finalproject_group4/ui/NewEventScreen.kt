@@ -35,11 +35,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.material.Text
-import androidx.compose.ui.graphics.painter.rememberImagePainter
-import androidx.compose.animation.Crossfade
+import coil.compose.rememberImagePainter
 
 
 @Composable
