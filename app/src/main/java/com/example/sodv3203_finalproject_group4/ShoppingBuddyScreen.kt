@@ -48,12 +48,15 @@ import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.sodv3203_finalproject_group4.ui.BookmarkScreen
 import com.example.sodv3203_finalproject_group4.ui.HistoryScreen
 import com.example.sodv3203_finalproject_group4.ui.HomeScreen
 import com.example.sodv3203_finalproject_group4.ui.NewEventScreen
 import com.example.sodv3203_finalproject_group4.ui.ProfileScreen
 import com.example.sodv3203_finalproject_group4.ui.SignInScreen
+import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 
 enum class ShoppingBuddyScreen(@StringRes val title: Int) {
     Home(title = R.string.app_name),
@@ -112,7 +115,8 @@ fun ShoppingBuddyAppBar(
 @Composable
 fun MyBottomNavigationBar(
     selectedTab: ShoppingBuddyScreen,
-    onTabSelected: (ShoppingBuddyScreen) -> Unit
+    onTabSelected: (ShoppingBuddyScreen) -> Unit,
+    navController: NavHostController
 ) {
     BottomNavigation(
         modifier = Modifier.fillMaxWidth(),
@@ -121,7 +125,14 @@ fun MyBottomNavigationBar(
     ) {
         BottomNavigationItem(
             selected = selectedTab == ShoppingBuddyScreen.Home,
-            onClick = { onTabSelected(ShoppingBuddyScreen.Home) },
+            //onClick = { onTabSelected(ShoppingBuddyScreen.Home) },
+            onClick = {
+                UserSessionManager.getCurrentUserId()?.let { userId ->
+                    navController.navigate("home/$userId")
+                } ?: run {
+                    navController.navigate("signIn")
+                }
+            },
             icon = { IconWithText(Icons.Default.Home, stringResource(id = R.string.home)) }
         )
         BottomNavigationItem(
@@ -187,8 +198,11 @@ fun ShoppingBuddyApp(
             MyBottomNavigationBar(
                 selectedTab = currentScreen,
                 onTabSelected = { screen ->
-                    navController.navigate(screen.name)
-                }
+                    navController.navigate(screen.name){
+
+                    }
+                },
+                navController = navController
             )
         }
     ) { innerPadding ->
@@ -214,8 +228,12 @@ fun ShoppingBuddyApp(
                 }
             }
 
-            composable(route = ShoppingBuddyScreen.NewEvent.name) {
+            /*composable(route = ShoppingBuddyScreen.NewEvent.name) {
                 NewEventScreen()
+            }*/
+            composable(route = "NewEvent/{userId}"){backStackEntry ->
+                backStackEntry.arguments?.getString("userId")?.toIntOrNull()?.let { userId -> NewEventScreen(userId = userId) }
+
             }
 
             composable(route = ShoppingBuddyScreen.Event.name) {
@@ -231,8 +249,9 @@ fun ShoppingBuddyApp(
             }
 
             composable(route = ShoppingBuddyScreen.Profile.name) {
-                ProfileScreen()
+                ProfileScreen(navController = navController)
             }
+
         }
     }
 }

@@ -41,7 +41,7 @@ import coil.compose.rememberImagePainter
 
 
 @Composable
-fun NewEventScreen() {
+fun NewEventScreen(userId: Int) {
     var firstSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
     var secondSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
     var isPhotoUploaded by remember { mutableStateOf(false) }
@@ -53,6 +53,10 @@ fun NewEventScreen() {
             selectedImageUri = it.toString()
             isPhotoUploaded = true
         }
+    }
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(text = "User ID: $userId", style = MaterialTheme.typography.h6)
+        // This is just to verify that now userId is available
     }
 
     LazyColumn(
@@ -386,6 +390,6 @@ fun PreviewDatePicker() {
 @Composable
 fun NewEventScreenPreview() {
     ShoppingBuddyAppTheme {
-        NewEventScreen()
+        NewEventScreen(userId = 2)
     }
 }

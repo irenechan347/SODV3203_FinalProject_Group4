@@ -19,9 +19,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sodv3203_finalproject_group4.R
 import android.content.Context
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
+import com.example.sodv3203_finalproject_group4.util.UserSessionManager
+
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(navController: NavController) {
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
@@ -103,6 +107,16 @@ fun ProfileScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            Button(onClick = {
+                UserSessionManager.logout()
+                navController.navigate("signIn") {
+                    popUpTo("signIn") { inclusive = true } // Replace "signIn" with your actual start destination ID
+                    launchSingleTop = true
+                }
+            }) {
+                Text("Logout")
+            }
+
             // Sign Out
             /*Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -130,6 +144,6 @@ fun ProfileScreen() {
 @Composable
 fun ProfileScreenPreview() {
     ShoppingBuddyAppTheme {
-        ProfileScreen()
+        ProfileScreen(navController = rememberNavController())
     }
 }
