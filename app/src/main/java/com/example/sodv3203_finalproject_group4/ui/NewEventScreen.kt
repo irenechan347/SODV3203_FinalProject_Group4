@@ -1,6 +1,5 @@
 package com.example.sodv3203_finalproject_group4.ui
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -28,15 +27,16 @@ import java.util.*
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.material.Text
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import coil.compose.rememberImagePainter
 
 
@@ -101,25 +101,31 @@ fun NewEventScreen(userId: Int) {
                             )
                         }
                     } else {
-                        // Display the upload icon
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(style = SpanStyle(fontSize = 12.sp)) {
-                                    append("Click to\n")
-                                }
-                                withStyle(style = SpanStyle(fontSize = 12.sp)) {
-                                    append("upload photo")
-                                }
-                            },
-                            color = Color.Gray
+                        // Display the placeholder image
+                        Image(
+                            painter = painterResource(id = R.drawable.img_event_1),
+                            contentDescription = "Placeholder Image",
+                            modifier = Modifier
+                                .size(140.dp)
+                                .fillMaxSize()
+                                .padding(bottom = 8.dp)
                         )
+                        // Display the upload icon
+//                        Text(
+//                            text = buildAnnotatedString {
+//                                withStyle(style = SpanStyle(fontSize = 12.sp)) {
+//                                    append("Click to\n")
+//                                }
+//                                withStyle(style = SpanStyle(fontSize = 12.sp)) {
+//                                    append("upload photo")
+//                                }
+//                            },
+//                            color = Color.Gray
+//                        )
                     }
                 }
             }
         }
-
-
-
 
         // 2. Row with Category Icon and a pull-down menu to select Category Name
         item {
@@ -128,17 +134,26 @@ fun NewEventScreen(userId: Int) {
 
         // 3. Row with Product icon and input box for text
         item {
-            InputRow(iconId = R.drawable.product, hint = "Product Name")
+            InputRow(iconId = R.drawable.product, hint = "Product Description")
+            { newValue ->
+                // Handle value change
+            }
         }
 
         // 4. Row with Location icon and input box for text
         item {
             InputRow(iconId = R.drawable.location, hint = "Location")
+            { newValue ->
+                // Handle value change
+            }
         }
 
         // 5. Row with People icon and input box for number
         item {
             InputRow(iconId = R.drawable.people, hint = "Number of People")
+            { newValue ->
+                // Handle value change
+            }
         }
 
         // 6. Row with Calendar icon and date pickers
@@ -154,6 +169,9 @@ fun NewEventScreen(userId: Int) {
         // 7. Row with Money icon and input box for price
         item {
             InputRow(iconId = R.drawable.dollar, hint = "Price per Person", isPriceInput = true)
+            { newValue ->
+                // Handle value change
+            }
         }
 
         // 8. Create button
@@ -232,7 +250,12 @@ fun CategoryRow() {
 }
 
 @Composable
-fun InputRow(iconId: Int, hint: String, isPriceInput: Boolean = false) {
+fun InputRow(
+    iconId: Int,
+    hint: String,
+    isPriceInput: Boolean = false,
+    onValueChange: (String) -> Unit // Add a callback for value change
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -249,18 +272,27 @@ fun InputRow(iconId: Int, hint: String, isPriceInput: Boolean = false) {
         Spacer(modifier = Modifier.width(8.dp))
 
         // Input field
+        val inputValue = remember { mutableStateOf(TextFieldValue()) }
+
         OutlinedTextField(
-            value = "",
-            onValueChange = { /* Handle input change */ },
+            value = inputValue.value,
+            onValueChange = {
+                // Check if the input is within the range of 1-5
+                val newValue = it.text.takeIf { text -> text.toIntOrNull() in 1..5 } ?: ""
+                inputValue.value = TextFieldValue(text = newValue)
+                onValueChange(newValue)
+            },
             placeholder = { Text(text = hint) },
             textStyle = MaterialTheme.typography.body1,
             singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            keyboardActions = KeyboardActions(onDone = { /* Handle keyboard done action */ }),
             modifier = Modifier.weight(1f)
         )
 
         // Optional currency label for price input
         if (isPriceInput) {
-                Text(text = "$", style = MaterialTheme.typography.body1)
+            Text(text = "$", style = MaterialTheme.typography.body1)
         }
     }
 }
