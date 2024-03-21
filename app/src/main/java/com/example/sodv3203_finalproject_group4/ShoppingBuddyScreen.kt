@@ -236,6 +236,7 @@ fun ShoppingBuddyApp(
 
             }
 
+            /*composable(route = ShoppingBuddyScreen.Event.name) {
                 EventScreen()
             }*/
             composable("eventScreen/{userId}/{eventId}") { backStackEntry ->
