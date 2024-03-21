@@ -27,8 +27,13 @@ import androidx.compose.runtime.Composable
 
 
 @Composable
-fun EventScreen() {
+fun EventScreen(userId: Int, eventId: Int) {
     var searchText by remember { mutableStateOf(TextFieldValue()) }
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(text = "User ID: $userId", style = MaterialTheme.typography.h6)
+        Text(text = "Event ID: $eventId", style = MaterialTheme.typography.h6)
+        // This is just to verify that now userId/eventId is available
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -155,6 +160,6 @@ fun EventCategoryRow(category: EventCategory, events: List<Event>) {
 @Composable
 fun EventScreenPreview() {
     ShoppingBuddyAppTheme {
-        EventScreen()
+        EventScreen( 2,2)
     }
 }
