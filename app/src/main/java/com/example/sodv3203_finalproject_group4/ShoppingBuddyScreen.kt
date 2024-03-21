@@ -53,6 +53,7 @@ import com.example.sodv3203_finalproject_group4.ui.HistoryScreen
 import com.example.sodv3203_finalproject_group4.ui.HomeScreen
 import com.example.sodv3203_finalproject_group4.ui.NewEventScreen
 import com.example.sodv3203_finalproject_group4.ui.ProfileScreen
+import com.example.sodv3203_finalproject_group4.ui.SignInScreen
 
 enum class ShoppingBuddyScreen(@StringRes val title: Int) {
     Home(title = R.string.app_name),
@@ -152,15 +153,25 @@ fun IconWithText(icon: ImageVector, label: String) {
     }
 }
 
+fun getShoppingBuddyScreenByRoute(route: String?): ShoppingBuddyScreen {
+    return try {
+        if (route != null) ShoppingBuddyScreen.valueOf(route) else ShoppingBuddyScreen.Home
+    } catch (e: IllegalArgumentException) {
+        // Log the error or handle it as deemed appropriate
+        ShoppingBuddyScreen.Home // Default to Home if the route is not recognized
+    }
+}
 @Composable
 fun ShoppingBuddyApp(
     viewModel: EventViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = ShoppingBuddyScreen.valueOf(
+    val currentScreen = getShoppingBuddyScreenByRoute(
+        backStackEntry?.destination?.route)
+    /*val currentScreen = ShoppingBuddyScreen.valueOf(
         backStackEntry?.destination?.route ?: ShoppingBuddyScreen.Home.name
-    )
+    )*/
     //val (selectedMenuItem, setSelectedMenuItem) = remember { mutableStateOf(0) }
 
     Scaffold(
@@ -185,12 +196,22 @@ fun ShoppingBuddyApp(
 
         NavHost(
             navController = navController,
-            startDestination = ShoppingBuddyScreen.Home.name,
+            //startDestination = ShoppingBuddyScreen.Home.name,
+            startDestination = "signIn",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = ShoppingBuddyScreen.Home.name) {
+            composable(route = "signIn") {
+                SignInScreen(navController = navController)
+            }
+            /*composable(route = ShoppingBuddyScreen.Home.name) {
                 // val context = LocalContext.current
                 HomeScreen(navController = navController)
+            }*/
+            composable(route = "home/{userId}") { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")
+                userId?.let {
+                    HomeScreen(navController = navController, userId = it.toInt())
+                }
             }
 
             composable(route = ShoppingBuddyScreen.NewEvent.name) {

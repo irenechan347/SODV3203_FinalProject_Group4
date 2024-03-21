@@ -13,6 +13,7 @@
     <string name="cat_others" />
     <string name="edit_profile">Edit Profile</string>
     <string name="sign_out">Sign Out</string>
+    <string name="sign_in">Sign In</string>
     <string name="night_mode_on">Night mode is on</string>
     <string name="night_mode_off">Night mode is off</string>
 </resources>

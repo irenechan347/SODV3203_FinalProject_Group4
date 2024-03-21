@@ -12,12 +12,10 @@ import java.util.Date
 private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 
 object Datasource {
-    val user = User(
-        1,
-        "Oliver",
-        "Oliver Johnson",
-        "oliver@mybvc.ca",
-        "+1 403 123 4567"
+    val users = listOf(
+        User(1, "Oliver", "Oliver Johnson", "oliver@mybvc.ca", "+1 403 123 4567"),
+        User(2, "Emma", "Emma Thompson", "emma@mybvc.ca", "+1 403 765 4321"),
+        // Add more User objects as needed
     )
 
     val categoryList = listOf(

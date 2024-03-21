@@ -48,14 +48,23 @@ import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, userId:Int) {
     var searchText by remember { mutableStateOf("") }
+    val user = remember {
+        Datasource.users.find { it.userId == userId }
+    }
+
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
+        // Display the greeting message at the top
+        if (user != null) {
+            Text(text = "Hi ${user.displayName}!", style = MaterialTheme.typography.h5)
+            Spacer(modifier = Modifier.height(16.dp))
+        }
         Row (
             modifier = Modifier
                 .fillMaxWidth()
@@ -64,7 +73,7 @@ fun HomeScreen(navController: NavHostController) {
             verticalAlignment = Alignment.CenterVertically
         ){
             IconButton(
-                onClick = { navController.navigate(ShoppingBuddyScreen.NewEvent.name) }
+                onClick = { navController.navigate("NewEvent/$userId") }
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -165,6 +174,6 @@ fun EventItem(event: Event) {
 fun HomeScreenPreview() {
     ShoppingBuddyAppTheme {
         val navController = rememberNavController()
-        HomeScreen(navController = navController)
+        HomeScreen(navController = navController, userId = 2)
     }
 }
