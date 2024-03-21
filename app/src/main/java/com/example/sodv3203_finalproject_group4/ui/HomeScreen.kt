@@ -42,7 +42,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.sodv3203_finalproject_group4.ShoppingBuddyScreen
 import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
@@ -115,19 +114,19 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
 
         LazyColumn(modifier = Modifier.padding(8.dp)) {
             items(filteredEvents) { event ->
-                EventItem(event = event)
+                EventItem(event = event, navController, userId)
             }
         }
     }
 }
 
 @Composable
-fun EventItem(event: Event) {
+fun EventItem(event: Event, navController: NavHostController, userId: Int) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { /* Handle click on event item */ },
+            .clickable {navController.navigate("eventScreen/$userId/${event.eventId}")},
         elevation = 4.dp,
         shape = RoundedCornerShape(16.dp)
     ) {
