@@ -11,4 +11,8 @@
     <string name="cat_bakery">Bakery</string>
     <string name="cat_fruits">Fruits</string>
     <string name="cat_others" />
+    <string name="edit_profile">Edit Profile</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="night_mode_on">Night mode is on</string>
+    <string name="night_mode_off">Night mode is off</string>
 </resources>
