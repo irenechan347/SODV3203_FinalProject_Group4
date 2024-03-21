@@ -1,6 +1,5 @@
 package com.example.sodv3203_finalproject_group4
 
-import EventScreen
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -54,6 +53,7 @@ import com.example.sodv3203_finalproject_group4.ui.BookmarkScreen
 import com.example.sodv3203_finalproject_group4.ui.HistoryScreen
 import com.example.sodv3203_finalproject_group4.ui.HomeScreen
 import com.example.sodv3203_finalproject_group4.ui.NewEventScreen
+import com.example.sodv3203_finalproject_group4.ui.EventScreen
 import com.example.sodv3203_finalproject_group4.ui.ProfileScreen
 import com.example.sodv3203_finalproject_group4.ui.SignInScreen
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager

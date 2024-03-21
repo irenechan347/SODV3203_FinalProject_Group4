@@ -38,6 +38,7 @@ import androidx.compose.material.Text
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import coil.compose.rememberImagePainter
+import java.text.SimpleDateFormat
 
 
 @Composable
@@ -134,7 +135,7 @@ fun NewEventScreen(userId: Int) {
 
         // 3. Row with Product icon and input box for text
         item {
-            InputRow(iconId = R.drawable.product, hint = "Product Description")
+            TextInputRow(iconId = R.drawable.product, hint = "Product Description")
             { newValue ->
                 // Handle value change
             }
@@ -142,7 +143,7 @@ fun NewEventScreen(userId: Int) {
 
         // 4. Row with Location icon and input box for text
         item {
-            InputRow(iconId = R.drawable.location, hint = "Location")
+            TextInputRow(iconId = R.drawable.location, hint = "Location")
             { newValue ->
                 // Handle value change
             }
@@ -150,7 +151,7 @@ fun NewEventScreen(userId: Int) {
 
         // 5. Row with People icon and input box for number
         item {
-            InputRow(iconId = R.drawable.people, hint = "Number of People")
+            PeopleInputRow(iconId = R.drawable.people, hint = "Number of People (1-5)")
             { newValue ->
                 // Handle value change
             }
@@ -168,7 +169,7 @@ fun NewEventScreen(userId: Int) {
 
         // 7. Row with Money icon and input box for price
         item {
-            InputRow(iconId = R.drawable.dollar, hint = "Price per Person", isPriceInput = true)
+            PriceInputRow(iconId = R.drawable.dollar, hint = "Price per Person")
             { newValue ->
                 // Handle value change
             }
@@ -250,12 +251,14 @@ fun CategoryRow() {
 }
 
 @Composable
-fun InputRow(
+fun TextInputRow(
     iconId: Int,
     hint: String,
-    isPriceInput: Boolean = false,
-    onValueChange: (String) -> Unit // Add a callback for value change
+    maxInputLength: Int = 30, // Maximum input length
+    onValueChange: (String) -> Unit // Callback for value change
 ) {
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -272,30 +275,145 @@ fun InputRow(
         Spacer(modifier = Modifier.width(8.dp))
 
         // Input field
-        val inputValue = remember { mutableStateOf(TextFieldValue()) }
+        var text by remember { mutableStateOf(TextFieldValue()) }
 
         OutlinedTextField(
-            value = inputValue.value,
+            value = text,
             onValueChange = {
-                // Check if the input is within the range of 1-5
-                val newValue = it.text.takeIf { text -> text.toIntOrNull() in 1..5 } ?: ""
-                inputValue.value = TextFieldValue(text = newValue)
-                onValueChange(newValue)
+                val newValue = it.text
+                text = it
+
+                // Check if input length exceeds the maximum limit
+                if (newValue.length > maxInputLength) {
+                    errorMessage = "Maximum input length is $maxInputLength"
+                } else {
+                    errorMessage = null
+                    onValueChange(newValue)
+                }
+            },
+            placeholder = { Text(text = hint) },
+            textStyle = MaterialTheme.typography.body1,
+            singleLine = true,
+            modifier = Modifier.weight(1f)
+        )
+    }
+
+    // Display error message if present
+    errorMessage?.let { message ->
+        Snackbar(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+            content = { Text(text = message) },
+            action = {
+                TextButton(onClick = { errorMessage = null }) {
+                    Text(text = "Dismiss")
+                }
+            }
+        )
+    }
+}
+
+
+
+@Composable
+fun PeopleInputRow(
+    iconId: Int,
+    hint: String,
+    onValueChange: (Int) -> Unit // Callback for integer value change
+) {
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+    ) {
+        // Icon
+        Image(
+            painter = painterResource(id = iconId),
+            contentDescription = null,
+            modifier = Modifier.size(24.dp),
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Input field
+        var text by remember { mutableStateOf(TextFieldValue()) }
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = {
+                val newValue = it.text
+                text = it
+                val intValue = newValue.toIntOrNull()
+                if (intValue != null && intValue in 1..5) {
+                    onValueChange(intValue)
+                    errorMessage = null // Clear error message if input is valid
+                } else {
+                    errorMessage = "Please enter a number between 1 and 5"
+                }
             },
             placeholder = { Text(text = hint) },
             textStyle = MaterialTheme.typography.body1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            keyboardActions = KeyboardActions(onDone = { /* Handle keyboard done action */ }),
             modifier = Modifier.weight(1f)
         )
+    }
 
-        // Optional currency label for price input
-        if (isPriceInput) {
-            Text(text = "$", style = MaterialTheme.typography.body1)
-        }
+    // Display error message if present
+    errorMessage?.let { message ->
+        Snackbar(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+            content = { Text(text = message) },
+            action = {
+                TextButton(onClick = { errorMessage = null }) {
+                    Text(text = "Dismiss")
+                }
+            }
+        )
     }
 }
+
+@Composable
+fun DatePicker(
+    selectedDate: Calendar,
+    onDateChange: (Calendar) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier.clickable { showDialog = true }
+    ) {
+        OutlinedTextField(
+            value = selectedDate.time.toFormattedString(),
+            onValueChange = { },
+            readOnly = true,
+            label = { Text("Date") },
+            modifier = modifier
+        )
+    }
+
+    if (showDialog) {
+        DatePickerDialog(
+            selectedDate = selectedDate,
+            onDismissRequest = { showDialog = false },
+            onSelectDate = {
+                onDateChange(it)
+                showDialog = false
+            }
+        )
+    }
+}
+
+
+
+fun Date.toFormattedString(): String {
+    val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+    return dateFormat.format(this)
+}
+
 
 @Composable
 fun DateRangePickerRow(
@@ -338,49 +456,21 @@ fun DateRangePickerRow(
     }
 }
 
-@Composable
-fun DatePicker(
-    selectedDate: Calendar,
-    onDateChange: (Calendar) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    OutlinedTextField(
-        value = selectedDate.time.toString(),
-        onValueChange = { },
-        readOnly = true,
-        label = { Text("Date") },
-        modifier = modifier
-    )
-
-
-
-    if (showDialog) {
-        DatePickerDialog(
-            onDismissRequest = { showDialog = false },
-            onSelectDate = {
-                onDateChange(it)
-                showDialog = false
-            }
-        )
-    }
-}
-
 
 @Composable
 fun DatePickerDialog(
+    selectedDate: Calendar,
     onDismissRequest: () -> Unit,
     onSelectDate: (Calendar) -> Unit
 ) {
-    var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
+    var tempSelectedDate by remember { mutableStateOf(selectedDate.clone() as Calendar) }
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(
                 onClick = {
-                    onSelectDate(selectedDate)
+                    onSelectDate(tempSelectedDate)
                     onDismissRequest()
                 }
             ) {
@@ -402,22 +492,52 @@ fun DatePickerDialog(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                DatePicker(
-                    selectedDate = selectedDate,
-                    onDateChange = { selectedDate = it }
+                CalendarView(
+                    selectedDate = tempSelectedDate,
+                    onDateSelected = { tempSelectedDate = it }
                 )
             }
         }
     )
 }
 
+@Composable
+fun CalendarView(
+    selectedDate: Calendar,
+    onDateSelected: (Calendar) -> Unit
+) {
+    // You can implement your custom calendar view here
+    // This is just a placeholder
+    Text("Custom calendar view")
+}
+
+
 @Preview
 @Composable
 fun PreviewDatePicker() {
     val selectedDate = remember { Calendar.getInstance() }
-    DatePicker(selectedDate = selectedDate, onDateChange = {})
+    DatePicker(
+        selectedDate = selectedDate,
+        onDateChange = { newDate ->
+            // Update the selectedDate with the new date
+            selectedDate.apply {
+                timeInMillis = newDate.timeInMillis
+            }
+            // Print the selected date for demonstration
+            println("Selected date: ${selectedDate.time}")
+        }
+    )
 }
 
+
+@Composable
+fun PriceInputRow(
+    iconId: Int,
+    hint: String,
+    onValueChange: (Double) -> Unit // Callback for price value change
+) {
+    // Implementation for input row specifically for prices
+}
 @Preview
 @Composable
 fun NewEventScreenPreview() {
