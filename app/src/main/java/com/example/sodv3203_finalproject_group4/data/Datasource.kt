@@ -24,9 +24,14 @@ object Datasource {
         EventCategory(1, R.string.cat_batteries),
         EventCategory(2, R.string.cat_bakery),
         EventCategory(3, R.string.cat_fruits),
-        EventCategory(4, R.string.cat_others)
+        //EventCategory(4, R.string.cat_others)
     )
 
+    val categoryMap = mapOf(
+        1 to "Batteries",
+        2 to "Bakery",
+        3 to "Fruits",
+    )
 
     val eventList = listOf(
         Event(
@@ -67,7 +72,7 @@ object Datasource {
             dateFormat.parse("2024-03-20"),
             5.00,
             "JohnDoe",
-            EventStatus.Available,
+            EventStatus.Paid,
             false,
             R.drawable.img_event_8
         ),
@@ -81,7 +86,7 @@ object Datasource {
             dateFormat.parse("2024-03-25"),
             10.00,
             "JaneSmith",
-            EventStatus.Available,
+            EventStatus.Completed,
             false,
             R.drawable.img_event_9
         ),
@@ -95,7 +100,7 @@ object Datasource {
             dateFormat.parse("2024-03-22"),
             30.00,
             "Sally",
-            EventStatus.Available,
+            EventStatus.Cancelled,
             false,
             R.drawable.img_event_4
         ),
