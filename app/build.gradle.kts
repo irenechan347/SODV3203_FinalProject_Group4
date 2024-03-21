@@ -64,6 +64,9 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.compose.material:material-android:1.6.2")
+    implementation("io.coil-kt:coil-compose:1.4.0")
+    implementation("androidx.compose.animation:animation:1.0.5")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

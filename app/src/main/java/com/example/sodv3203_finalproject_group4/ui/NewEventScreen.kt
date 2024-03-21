@@ -1,8 +1,13 @@
 package com.example.sodv3203_finalproject_group4.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,60 +26,139 @@ import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import java.util.*
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.*
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.material.Text
+import androidx.compose.ui.graphics.painter.rememberImagePainter
+import androidx.compose.animation.Crossfade
 
 
 @Composable
 fun NewEventScreen() {
     var firstSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
     var secondSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
+    var isPhotoUploaded by remember { mutableStateOf(false) }
+    var selectedImageUri by remember { mutableStateOf<String?>(null) }
 
-    Column(
+    val chooseImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            // Handle the selected image URI
+            selectedImageUri = it.toString()
+            isPhotoUploaded = true
+        }
+    }
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(10.dp)
     ) {
-        // 1. Display a blank photo frame with specific size, allow users to upload an image
-        Box(
-            modifier = Modifier
-                .size(200.dp)
-                .padding(bottom = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
+        item {
+            // Display the uploaded photo or the placeholder text
             Box(
                 modifier = Modifier
-                    .size(120.dp)
-                    .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.medium)
+                    .size(140.dp)
+                    .padding(bottom = 8.dp),
+                contentAlignment = Alignment.Center
             ) {
-                // No need to display any image here
+                Box(
+                    modifier = Modifier
+                        .size(140.dp)
+                        .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.medium)
+                        .clickable {
+                            // Open file picker when the box is clicked
+                            chooseImageLauncher.launch("image/*")
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Display the selected image or the upload icon
+                    if (isPhotoUploaded) {
+                        selectedImageUri?.let {
+                            // Display the selected image
+                            val painter = rememberImagePainter(
+                                data = it,
+                                builder = {
+                                    crossfade(true) // Optional: enable crossfade animation
+                                }
+                            )
+                            Image(
+                                painter = painter,
+                                contentDescription = "Uploaded Photo",
+                                modifier = Modifier
+                                    .size(140.dp)
+                                    .padding(bottom = 8.dp)
+                            )
+                        }
+                    } else {
+                        // Display the upload icon
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(style = SpanStyle(fontSize = 12.sp)) {
+                                    append("Click to\n")
+                                }
+                                withStyle(style = SpanStyle(fontSize = 12.sp)) {
+                                    append("upload photo")
+                                }
+                            },
+                            color = Color.Gray
+                        )
+                    }
+                }
             }
         }
 
+
+
+
         // 2. Row with Category Icon and a pull-down menu to select Category Name
-        CategoryRow()
+        item {
+            CategoryRow()
+        }
 
         // 3. Row with Product icon and input box for text
-        InputRow(iconId = R.drawable.product, hint = "Product Name")
+        item {
+            InputRow(iconId = R.drawable.product, hint = "Product Name")
+        }
 
         // 4. Row with Location icon and input box for text
-        InputRow(iconId = R.drawable.location, hint = "Location")
+        item {
+            InputRow(iconId = R.drawable.location, hint = "Location")
+        }
 
         // 5. Row with People icon and input box for number
-        InputRow(iconId = R.drawable.people, hint = "Number of People")
+        item {
+            InputRow(iconId = R.drawable.people, hint = "Number of People")
+        }
 
         // 6. Row with Calendar icon and date pickers
-        DateRangePickerRow(
-            firstSelectedDate = firstSelectedDate,
-            onFirstDateSelected = { firstSelectedDate = it },
-            secondSelectedDate = secondSelectedDate,
-            onSecondDateSelected = { secondSelectedDate = it }
-        )
+        item {
+            DateRangePickerRow(
+                firstSelectedDate = firstSelectedDate,
+                onFirstDateSelected = { firstSelectedDate = it },
+                secondSelectedDate = secondSelectedDate,
+                onSecondDateSelected = { secondSelectedDate = it }
+            )
+        }
 
         // 7. Row with Money icon and input box for price
-        InputRow(iconId = R.drawable.dollar, hint = "Price per Person", isPriceInput = true)
+        item {
+            InputRow(iconId = R.drawable.dollar, hint = "Price per Person", isPriceInput = true)
+        }
 
         // 8. Create button
-        Button(onClick = { /* Handle create button click */ }) {
-            Text(text = "Create", modifier = Modifier.padding(horizontal = 16.dp))
+        item {
+            Button(onClick = { /* Handle create button click */ }) {
+                Text(text = "Create", modifier = Modifier.padding(horizontal = 16.dp))
+            }
         }
     }
 }
@@ -82,6 +166,7 @@ fun NewEventScreen() {
 @Composable
 fun CategoryRow() {
     var selectedCategory by remember { mutableStateOf(Datasource.categoryList[0]) }
+    var expanded by remember { mutableStateOf(false) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -93,30 +178,54 @@ fun CategoryRow() {
         Image(
             painter = painterResource(id = R.drawable.category),
             contentDescription = null,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(24.dp)
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Dropdown menu for selecting category
+        // Box to hold the dropdown menu
+        Box(
+            modifier = Modifier
+                .weight(1f) // Occupy the whole available width
+                .clickable { expanded = !expanded } // Toggle expanded state
+                .border(1.dp, Color.Gray, MaterialTheme.shapes.medium) // Add border
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Display selected category name
+                Text(
+                    text = stringResource(id = selectedCategory.categoryName),
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.weight(1f)
+                )
+
+                // Dropdown arrow icon
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+
+        // DropdownMenu
         DropdownMenu(
-            expanded = false, // Change to true to show dropdown menu
-            onDismissRequest = { /* Handle dropdown menu dismiss */ },
-            modifier = Modifier.wrapContentSize()
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.width(120.dp) // Adjust width as needed
         ) {
             Datasource.categoryList.forEach { category ->
-                DropdownMenuItem(onClick = { selectedCategory = category }) {
+                DropdownMenuItem(onClick = {
+                    selectedCategory = category
+                    expanded = false
+                }) {
                     Text(text = stringResource(id = category.categoryName))
                 }
             }
         }
-
-        // Display selected category name
-        Text(
-            text = stringResource(id = selectedCategory.categoryName),
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier.padding(start = 8.dp)
-        )
     }
 }
 
