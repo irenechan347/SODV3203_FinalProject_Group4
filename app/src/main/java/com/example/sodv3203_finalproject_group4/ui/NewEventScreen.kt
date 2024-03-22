@@ -1,7 +1,6 @@
 package com.example.sodv3203_finalproject_group4.ui
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -32,35 +31,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import coil.compose.rememberImagePainter
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.staticCompositionLocalOf
 import java.text.SimpleDateFormat
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.AnnotatedString
 
-
-
-private val LocalFocusManager = staticCompositionLocalOf<FocusManager?> { null }
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-<<<<<<< Updated upstream
+
 fun NewEventScreen(userId: Int, eventId: Int = -1) {
-    var firstSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
-    var secondSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
-=======
-fun NewEventScreen(userId: Int) {
 
     // Initialize firstSelectedDate to today's date
     val today = Date()
@@ -70,9 +54,8 @@ fun NewEventScreen(userId: Int) {
     val calendar = Calendar.getInstance()
     calendar.time = firstSelectedDate
     calendar.add(Calendar.DAY_OF_YEAR, 3)
-    var secondSelectedDate by remember { mutableStateOf(calendar.time) }
+    val secondSelectedDate by remember { mutableStateOf(calendar.time) }
 
->>>>>>> Stashed changes
     var isPhotoUploaded by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<String?>(null) }
 
@@ -442,60 +425,23 @@ fun PeopleInputRow(
     }
 }
 
-@Composable
-fun MyComposable() {
-    val selectedDate = remember { mutableStateOf(Date()) }
-
-    DateInputField(selectedDate = selectedDate)
-}
 
 @Composable
 fun DateInputField(selectedDate: MutableState<Date>, modifier: Modifier = Modifier) {
     val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
 
-    val focusManager = LocalFocusManager.current
-
     OutlinedTextField(
-        value = dateFormat.format(selectedDate.value),
-        onValueChange = { newValue ->
-            // Parse the input text to a Date object
-            val parsedDate = parseDate(newValue)
-            parsedDate?.let {
-                selectedDate.value = it
-            }
-        },
+        value = dateFormat.format(selectedDate),
+        onValueChange = { /* No-op */ }, // Disable text input
+        readOnly = true, // Make the text field read-only
         label = { /* Label text */ },
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                // Hide the keyboard when done
-                focusManager?.clearFocus()
-            }
+            keyboardType = KeyboardType.Number
         ),
         modifier = modifier
     )
+
 }
-
-private fun parseDate(input: String): Date? {
-    return try {
-        val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-        dateFormat.isLenient = false // Ensure strict parsing
-        dateFormat.parse(input)
-    } catch (e: Exception) {
-        null
-    }
-}
-
-
-private fun isValidDateFormat(date: String): Boolean {
-    return date.matches(Regex("\\d{4}/\\d{2}/\\d{2}"))
-}
-
-
-
 
 
 @Composable
