@@ -1,5 +1,7 @@
 package com.example.sodv3203_finalproject_group4.ui
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -24,7 +26,6 @@ import com.example.sodv3203_finalproject_group4.R
 import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import java.util.*
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.foundation.layout.Box
@@ -33,18 +34,45 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.material.Text
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import coil.compose.rememberImagePainter
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import java.text.SimpleDateFormat
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.AnnotatedString
 
 
+
+private val LocalFocusManager = staticCompositionLocalOf<FocusManager?> { null }
+
+@SuppressLint("UnrememberedMutableState")
 @Composable
+<<<<<<< Updated upstream
 fun NewEventScreen(userId: Int, eventId: Int = -1) {
     var firstSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
     var secondSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
+=======
+fun NewEventScreen(userId: Int) {
+
+    // Initialize firstSelectedDate to today's date
+    val today = Date()
+    val firstSelectedDate by remember { mutableStateOf(today) }
+
+    // Initialize secondSelectedDate to firstSelectedDate + 3 days
+    val calendar = Calendar.getInstance()
+    calendar.time = firstSelectedDate
+    calendar.add(Calendar.DAY_OF_YEAR, 3)
+    var secondSelectedDate by remember { mutableStateOf(calendar.time) }
+
+>>>>>>> Stashed changes
     var isPhotoUploaded by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<String?>(null) }
 
@@ -94,7 +122,7 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
                             val painter = rememberImagePainter(
                                 data = it,
                                 builder = {
-                                    crossfade(true) // Optional: enable crossfade animation
+                                    crossfade(true)
                                 }
                             )
                             Image(
@@ -161,15 +189,49 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
             }
         }
 
-        // 6. Row with Calendar icon and date pickers
+        // 6. Row with Calendar icon and date inputs
         item {
-            DateRangePickerRow(
-                firstSelectedDate = firstSelectedDate,
-                onFirstDateSelected = { firstSelectedDate = it },
-                secondSelectedDate = secondSelectedDate,
-                onSecondDateSelected = { secondSelectedDate = it }
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            ) {
+                // Calendar icon
+                Image(
+                    painter = painterResource(id = R.drawable.calendar),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // First date input field (non-editable)
+                Box(
+                    modifier = Modifier
+                        .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.medium)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .clickable { /* Empty onClick lambda to prevent interaction */ }
+                        .weight(1f)
+                ) {
+                    // Display the selected date
+                    Text(
+                        text = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(firstSelectedDate),
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // "To" text
+                Text(text = "to", modifier = Modifier.align(Alignment.CenterVertically))
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Second date input field
+                DateInputField(selectedDate = mutableStateOf(secondSelectedDate), modifier = Modifier.weight(1f))
+            }
         }
+
 
         // 7. Row with Money icon and input box for price
         item {
@@ -187,6 +249,7 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
         }
     }
 }
+
 
 @Composable
 fun CategoryRow() {
@@ -380,158 +443,59 @@ fun PeopleInputRow(
 }
 
 @Composable
-fun DatePicker(
-    selectedDate: Calendar,
-    onDateChange: (Calendar) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var showDialog by remember { mutableStateOf(false) }
+fun MyComposable() {
+    val selectedDate = remember { mutableStateOf(Date()) }
 
-    Box(
-        modifier = modifier.clickable { showDialog = true }
-    ) {
-        OutlinedTextField(
-            value = selectedDate.time.toFormattedString(),
-            onValueChange = { },
-            readOnly = true,
-            label = { Text("Date") },
-            modifier = modifier
-        )
-    }
-
-    if (showDialog) {
-        DatePickerDialog(
-            selectedDate = selectedDate,
-            onDismissRequest = { showDialog = false },
-            onSelectDate = {
-                onDateChange(it)
-                showDialog = false
-            }
-        )
-    }
+    DateInputField(selectedDate = selectedDate)
 }
 
-
-
-fun Date.toFormattedString(): String {
+@Composable
+fun DateInputField(selectedDate: MutableState<Date>, modifier: Modifier = Modifier) {
     val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-    return dateFormat.format(this)
+
+    val focusManager = LocalFocusManager.current
+
+    OutlinedTextField(
+        value = dateFormat.format(selectedDate.value),
+        onValueChange = { newValue ->
+            // Parse the input text to a Date object
+            val parsedDate = parseDate(newValue)
+            parsedDate?.let {
+                selectedDate.value = it
+            }
+        },
+        label = { /* Label text */ },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                // Hide the keyboard when done
+                focusManager?.clearFocus()
+            }
+        ),
+        modifier = modifier
+    )
 }
 
-
-@Composable
-fun DateRangePickerRow(
-    firstSelectedDate: Calendar,
-    onFirstDateSelected: (Calendar) -> Unit,
-    secondSelectedDate: Calendar,
-    onSecondDateSelected: (Calendar) -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp)
-    ) {
-        // Calendar icon
-        Image(
-            painter = painterResource(id = R.drawable.calendar),
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // First date picker
-        DatePicker(
-            selectedDate = firstSelectedDate,
-            onDateChange = onFirstDateSelected,
-            modifier = Modifier.weight(1f)
-        )
-
-        // "To" text
-        Text(text = "to", modifier = Modifier.padding(horizontal = 8.dp))
-
-        // Second date picker
-        DatePicker(
-            selectedDate = secondSelectedDate,
-            onDateChange = onSecondDateSelected,
-            modifier = Modifier.weight(1f)
-        )
+private fun parseDate(input: String): Date? {
+    return try {
+        val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+        dateFormat.isLenient = false // Ensure strict parsing
+        dateFormat.parse(input)
+    } catch (e: Exception) {
+        null
     }
 }
 
 
-@Composable
-fun DatePickerDialog(
-    selectedDate: Calendar,
-    onDismissRequest: () -> Unit,
-    onSelectDate: (Calendar) -> Unit
-) {
-    var tempSelectedDate by remember { mutableStateOf(selectedDate.clone() as Calendar) }
-
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onSelectDate(tempSelectedDate)
-                    onDismissRequest()
-                }
-            ) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismissRequest
-            ) {
-                Text("Cancel")
-            }
-        },
-        title = {
-            Text("Select Date")
-        },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CalendarView(
-                    selectedDate = tempSelectedDate,
-                    onDateSelected = { tempSelectedDate = it }
-                )
-            }
-        }
-    )
-}
-
-@Composable
-fun CalendarView(
-    selectedDate: Calendar,
-    onDateSelected: (Calendar) -> Unit
-) {
-    // You can implement your custom calendar view here
-    // This is just a placeholder
-    Text("Custom calendar view")
+private fun isValidDateFormat(date: String): Boolean {
+    return date.matches(Regex("\\d{4}/\\d{2}/\\d{2}"))
 }
 
 
-@Preview
-@Composable
-fun PreviewDatePicker() {
-    val selectedDate = remember { Calendar.getInstance() }
-    DatePicker(
-        selectedDate = selectedDate,
-        onDateChange = { newDate ->
-            // Update the selectedDate with the new date
-            selectedDate.apply {
-                timeInMillis = newDate.timeInMillis
-            }
-            // Print the selected date for demonstration
-            println("Selected date: ${selectedDate.time}")
-        }
-    )
-}
+
 
 
 @Composable
