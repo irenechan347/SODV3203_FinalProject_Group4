@@ -24,6 +24,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -122,6 +124,8 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
 
 @Composable
 fun EventItem(event: Event, navController: NavHostController, userId: Int) {
+    var isBookmarked by remember { mutableStateOf(event.isBookmark) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -162,6 +166,16 @@ fun EventItem(event: Event, navController: NavHostController, userId: Int) {
                     text = "Price: $${event.price}",
                     style = MaterialTheme.typography.body2,
                     color = Color.Gray
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            IconButton(
+                onClick = { isBookmarked = !isBookmarked }
+            ) {
+                Icon(
+                    imageVector = if (isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "Bookmark",
+                    tint = Color(0xFFFF4500)
                 )
             }
         }
