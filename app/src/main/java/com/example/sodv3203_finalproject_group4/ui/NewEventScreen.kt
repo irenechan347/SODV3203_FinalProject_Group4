@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import coil.compose.rememberImagePainter
 import androidx.compose.material.OutlinedTextField
+import com.example.sodv3203_finalproject_group4.model.Event
 import java.text.SimpleDateFormat
 
 
@@ -98,8 +99,31 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
                         },
                     contentAlignment = Alignment.Center
                 ) {
+                    // Check if fromEvent is not null and if there's a selected image URI
+                    val defaultImageId = fromEvent?.imageId
+
                     // Display the selected image or the upload icon
-                    if (isPhotoUploaded) {
+                    if (isPhotoUploaded || defaultImageId != null) {
+                        val painter = if (isPhotoUploaded) {
+                            // Display the selected image
+                            rememberImagePainter(
+                                data = selectedImageUri,
+                                builder = {
+                                    crossfade(true)
+                                }
+                            )
+                        } else {
+                            // Display the default image based on imageId
+                            painterResource(id = defaultImageId!!)
+                        }
+                        Image(
+                            painter = painter,
+                            contentDescription = "Uploaded Photo",
+                            modifier = Modifier
+                                .size(140.dp)
+                                .padding(bottom = 8.dp)
+                        )
+                        /*
                         selectedImageUri?.let {
                             // Display the selected image
                             val painter = rememberImagePainter(
@@ -116,6 +140,7 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
                                     .padding(bottom = 8.dp)
                             )
                         }
+                         */
                     } else {
                         // Display the placeholder image
                         Image(
@@ -145,22 +170,38 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
         // 2. Row with Category Icon and a pull-down menu to select Category Name
         item {
-            CategoryRow()
+            if (fromEvent != null) {
+                CategoryRow(fromEvent)
+            } else {
+                CategoryRow()
+            }
         }
 
         // 3. Row with Product icon and input box for text
         item {
-            TextInputRow(iconId = R.drawable.product, hint = "Product Description")
-            { newValue ->
-                // Handle value change
+            if (fromEvent != null) {
+                TextInputRow(iconId = R.drawable.product, hint = "Product Description", initialText = fromEvent.productName ?: "") { newValue ->
+                    // Handle value change
+                }
+            } else {
+                TextInputRow(iconId = R.drawable.product, hint = "Product Description")
+                { newValue ->
+                    // Handle value change
+                }
             }
         }
 
         // 4. Row with Location icon and input box for text
         item {
-            TextInputRow(iconId = R.drawable.location, hint = "Location")
-            { newValue ->
-                // Handle value change
+            if (fromEvent != null) {
+                TextInputRow(iconId = R.drawable.location, hint = "Location", initialText = fromEvent.location ?: "") { newValue ->
+                    // Handle value change
+                }
+            } else {
+                TextInputRow(iconId = R.drawable.location, hint = "Location")
+                { newValue ->
+                    // Handle value change
+                }
             }
         }
 
@@ -235,9 +276,13 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
 
 @Composable
-fun CategoryRow() {
+fun CategoryRow(fromEvent: Event? = null) {
     var selectedCategory by remember { mutableStateOf(Datasource.categoryList[0]) }
     var expanded by remember { mutableStateOf(false) }
+
+    if(fromEvent != null) {
+        selectedCategory = Datasource.categoryList.find { it.categoryId == fromEvent.categoryId }!!
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -304,6 +349,7 @@ fun CategoryRow() {
 fun TextInputRow(
     iconId: Int,
     hint: String,
+    initialText: String = "",
     maxInputLength: Int = 30, // Maximum input length
     onValueChange: (String) -> Unit // Callback for value change
 ) {
@@ -325,7 +371,7 @@ fun TextInputRow(
         Spacer(modifier = Modifier.width(8.dp))
 
         // Input field
-        var text by remember { mutableStateOf(TextFieldValue()) }
+        var text by remember { mutableStateOf(TextFieldValue(initialText)) }
 
         OutlinedTextField(
             value = text,

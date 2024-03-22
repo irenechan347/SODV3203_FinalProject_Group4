@@ -102,8 +102,8 @@ fun HistoryListItem(event: Event, navController: NavHostController, userId:Int) 
             .weight(1f)
             .padding(5.dp)
         ) {
-            Row() {
-                Column {
+            Row {
+                Column (modifier = Modifier.width(180.dp)) {
                     Text(
                         text = "$categoryName : ${event.productName}",
                         fontWeight = FontWeight.Bold,
