@@ -149,7 +149,14 @@ fun MyBottomNavigationBar(
         )
         BottomNavigationItem(
             selected = selectedTab == ShoppingBuddyScreen.Bookmark,
-            onClick = { onTabSelected(ShoppingBuddyScreen.Bookmark) },
+            onClick = {
+                //onTabSelected(ShoppingBuddyScreen.Bookmark)
+                UserSessionManager.getCurrentUserId()?.let { userId ->
+                    navController.navigate("${ShoppingBuddyScreen.Bookmark.name}/$userId")
+                } ?: run {
+                    navController.navigate("signIn")
+                }
+            },
             icon = { IconWithText(Icons.Default.FavoriteBorder, stringResource(id = R.string.bookmark)) }
         )
         BottomNavigationItem(
@@ -263,8 +270,9 @@ fun ShoppingBuddyApp(
                 HistoryScreen(navController, userId)
             }
 
-            composable(route = ShoppingBuddyScreen.Bookmark.name) {
-                BookmarkScreen()
+            composable(route = "${ShoppingBuddyScreen.Bookmark.name}/{userId}") {backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
+                BookmarkScreen(navController, userId)
             }
 
             composable(route = ShoppingBuddyScreen.Profile.name) {
