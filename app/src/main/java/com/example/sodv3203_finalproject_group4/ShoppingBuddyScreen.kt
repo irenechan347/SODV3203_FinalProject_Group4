@@ -137,7 +137,14 @@ fun MyBottomNavigationBar(
         )
         BottomNavigationItem(
             selected = selectedTab == ShoppingBuddyScreen.History,
-            onClick = { onTabSelected(ShoppingBuddyScreen.History) },
+            onClick = {
+                //onTabSelected(ShoppingBuddyScreen.History)
+                UserSessionManager.getCurrentUserId()?.let { userId ->
+                    navController.navigate("${ShoppingBuddyScreen.History.name}/$userId")
+                } ?: run {
+                    navController.navigate("signIn")
+                }
+            },
             icon = { IconWithText(Icons.Default.List, stringResource(id = R.string.history)) }
         )
         BottomNavigationItem(
@@ -236,6 +243,12 @@ fun ShoppingBuddyApp(
 
             }
 
+            composable(route = "NewEvent/{userId}/{eventId}"){backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
+                val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: throw IllegalArgumentException("Event ID not found")
+                NewEventScreen(userId = userId, eventId = eventId)
+            }
+
             /*composable(route = ShoppingBuddyScreen.Event.name) {
                 EventScreen()
             }*/
@@ -245,8 +258,9 @@ fun ShoppingBuddyApp(
                 EventScreen(userId = userId, eventId = eventId)
             }
 
-            composable(route = ShoppingBuddyScreen.History.name) {
-                HistoryScreen()
+            composable(route = "${ShoppingBuddyScreen.History.name}/{userId}") {backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
+                HistoryScreen(navController, userId)
             }
 
             composable(route = ShoppingBuddyScreen.Bookmark.name) {

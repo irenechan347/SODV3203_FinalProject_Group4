@@ -42,11 +42,15 @@ import java.text.SimpleDateFormat
 
 
 @Composable
-fun NewEventScreen(userId: Int) {
+fun NewEventScreen(userId: Int, eventId: Int = -1) {
     var firstSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
     var secondSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
     var isPhotoUploaded by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<String?>(null) }
+
+    val fromEvent = remember {
+        Datasource.eventList.find { it.eventId == eventId }
+    }
 
     val chooseImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
