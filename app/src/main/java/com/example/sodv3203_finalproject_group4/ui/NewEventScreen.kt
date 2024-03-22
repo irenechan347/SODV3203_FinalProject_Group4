@@ -431,7 +431,7 @@ fun DateInputField(selectedDate: MutableState<Date>, modifier: Modifier = Modifi
     val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
 
     OutlinedTextField(
-        value = dateFormat.format(selectedDate),
+        value = dateFormat.format(selectedDate.value),
         onValueChange = { /* No-op */ }, // Disable text input
         readOnly = true, // Make the text field read-only
         label = { /* Label text */ },
@@ -456,6 +456,6 @@ fun PriceInputRow(
 @Composable
 fun NewEventScreenPreview() {
     ShoppingBuddyAppTheme {
-        NewEventScreen(userId = 2)
+        NewEventScreen(userId = 2, eventId = -1)
     }
 }
