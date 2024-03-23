@@ -166,13 +166,16 @@ fun ProfileScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = {
-                UserSessionManager.logout()
-                navController.navigate("signIn") {
-                    popUpTo("signIn") { inclusive = true } // Replace "signIn" with your actual start destination ID
-                    launchSingleTop = true
-                }
-            }) {
+            Button(
+                onClick = {
+                    UserSessionManager.logout()
+                    navController.navigate("signIn") {
+                        popUpTo("signIn") { inclusive = true } // Replace "signIn" with your actual start destination ID
+                        launchSingleTop = true
+                    }
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
                 Text("Logout")
             }
         }
