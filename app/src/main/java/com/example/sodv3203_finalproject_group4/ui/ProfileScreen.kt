@@ -19,6 +19,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sodv3203_finalproject_group4.R
 import android.content.Context
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
@@ -26,10 +30,17 @@ import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 
 @Composable
 fun ProfileScreen(navController: NavController) {
+    var username by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var bio by remember { mutableStateOf("") }
+
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
     ) {
+        Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
@@ -40,13 +51,13 @@ fun ProfileScreen(navController: NavController) {
             ) {
                 // Group 4
                 Text(
-                    text = "Group 4",
+                    text = "Oliver",
                     style = MaterialTheme.typography.h5
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 // Email
                 Text(
-                    text = "example@gmail.com",
+                    text = "oliver@mybvc.ca",
                     style = MaterialTheme.typography.body1
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -54,7 +65,7 @@ fun ProfileScreen(navController: NavController) {
 
             // Divider line
             Divider(
-                color = Color.Black,
+                //color = Color.Black,
                 thickness = 1.dp,
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
             )
@@ -74,12 +85,60 @@ fun ProfileScreen(navController: NavController) {
                 Text(
                     text = "Edit Profile",
                     style = MaterialTheme.typography.button,
-                    color = Color.Black
+                    //color = Color.Black
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Night Mode Toggle
+            Column(modifier = Modifier.padding(16.dp)) {
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = { Text("Username") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = firstName,
+                    onValueChange = { firstName = it },
+                    label = { Text("First Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = lastName,
+                    onValueChange = { lastName = it },
+                    label = { Text("Last Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = bio,
+                    onValueChange = { bio = it },
+                    label = { Text("Bio") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = {
+                        // Perform action on button click
+                    },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text("Save")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            /*// Night Mode Toggle
             val isNightMode = remember { mutableStateOf(false) }
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -103,7 +162,7 @@ fun ProfileScreen(navController: NavController) {
                         isNightMode.value = isChecked
                     }
                 )
-            }
+            }*/
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -116,26 +175,27 @@ fun ProfileScreen(navController: NavController) {
             }) {
                 Text("Logout")
             }
-
-            // Sign Out
-            /*Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = android.R.drawable.ic_lock_power_off),
-                    contentDescription = null,
-                    tint = Color.Black,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Sign Out",
-                    style = MaterialTheme.typography.button,
-                    color = MaterialTheme.colors.primary
-                )
-
-            }*/
         }
+        }
+    }
+}
+@Composable
+fun ProfileInformationField(label: String, value: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.body1,
+            modifier = Modifier.width(120.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        TextField(
+            value = value,
+            onValueChange = { /*TODO*/ },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
