@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,7 +19,13 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +36,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.data.Datasource.eventList
 import com.example.sodv3203_finalproject_group4.model.Event
@@ -37,22 +46,22 @@ import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import kotlin.math.ceil
 
 @Composable
-fun HistoryScreen() {
+fun HistoryScreen(navController: NavHostController, userId:Int) {
     val filteredEventList = eventList.filter { it.status != EventStatus.Available }
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        HistoryList(filteredEventList)
+        HistoryList(filteredEventList, navController, userId)
     }
 }
 
 @Composable
-fun HistoryList(eventList: List<Event>) {
+fun HistoryList(eventList: List<Event>, navController: NavHostController, userId:Int) {
     LazyColumn {
         items(eventList) { event ->
-            HistoryListItem(event = event)
+            HistoryListItem(event = event, navController, userId)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -65,7 +74,7 @@ fun HistoryList(eventList: List<Event>) {
 }
 
 @Composable
-fun HistoryListItem(event: Event) {
+fun HistoryListItem(event: Event, navController: NavHostController, userId:Int) {
     val categoryName = Datasource.categoryMap[event.categoryId]
 
     Row(
@@ -93,15 +102,29 @@ fun HistoryListItem(event: Event) {
             .weight(1f)
             .padding(5.dp)
         ) {
-            Text(
-                text = "$categoryName : ${event.productName}",
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = "$${event.price} ($${ceil(event.price/event.currHeadCount)} per Share)",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
+            Row {
+                Column (modifier = Modifier.width(180.dp)) {
+                    Text(
+                        text = "$categoryName : ${event.productName}",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = "$${event.price} ($${ceil(event.price/event.currHeadCount)} per Share)",
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    onClick = { navController.navigate("NewEvent/$userId/${event.eventId}") }
+                ) {
+                    androidx.compose.material.Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = "Copy Event",
+                        tint = Color(0xFFFF4500)
+                    )
+                }
+            }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom
@@ -163,6 +186,7 @@ private fun ButtonColors(status: EventStatus): ButtonColors {
 @Composable
 fun HistoryScreenPreview() {
     ShoppingBuddyAppTheme {
-        HistoryScreen()
+        val navController = rememberNavController()
+        HistoryScreen(navController, 2)
     }
 }

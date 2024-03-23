@@ -1,5 +1,6 @@
 package com.example.sodv3203_finalproject_group4.ui
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -24,29 +25,44 @@ import com.example.sodv3203_finalproject_group4.R
 import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import java.util.*
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.material.Text
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import coil.compose.rememberImagePainter
+import androidx.compose.material.OutlinedTextField
+import com.example.sodv3203_finalproject_group4.model.Event
 import java.text.SimpleDateFormat
 
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
-fun NewEventScreen(userId: Int) {
-    var firstSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
-    var secondSelectedDate by remember { mutableStateOf(Calendar.getInstance()) }
+
+fun NewEventScreen(userId: Int, eventId: Int = -1) {
+
+    // Initialize firstSelectedDate to today's date
+    val today = Date()
+    val firstSelectedDate by remember { mutableStateOf(today) }
+
+    // Initialize secondSelectedDate to firstSelectedDate + 3 days
+    val calendar = Calendar.getInstance()
+    calendar.time = firstSelectedDate
+    calendar.add(Calendar.DAY_OF_YEAR, 3)
+    val secondSelectedDate by remember { mutableStateOf(calendar.time) }
+
     var isPhotoUploaded by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<String?>(null) }
+
+    val fromEvent = remember {
+        Datasource.eventList.find { it.eventId == eventId }
+    }
 
     val chooseImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
@@ -83,14 +99,37 @@ fun NewEventScreen(userId: Int) {
                         },
                     contentAlignment = Alignment.Center
                 ) {
+                    // Check if fromEvent is not null and if there's a selected image URI
+                    val defaultImageId = fromEvent?.imageId
+
                     // Display the selected image or the upload icon
-                    if (isPhotoUploaded) {
+                    if (isPhotoUploaded || defaultImageId != null) {
+                        val painter = if (isPhotoUploaded) {
+                            // Display the selected image
+                            rememberImagePainter(
+                                data = selectedImageUri,
+                                builder = {
+                                    crossfade(true)
+                                }
+                            )
+                        } else {
+                            // Display the default image based on imageId
+                            painterResource(id = defaultImageId!!)
+                        }
+                        Image(
+                            painter = painter,
+                            contentDescription = "Uploaded Photo",
+                            modifier = Modifier
+                                .size(140.dp)
+                                .padding(bottom = 8.dp)
+                        )
+                        /*
                         selectedImageUri?.let {
                             // Display the selected image
                             val painter = rememberImagePainter(
                                 data = it,
                                 builder = {
-                                    crossfade(true) // Optional: enable crossfade animation
+                                    crossfade(true)
                                 }
                             )
                             Image(
@@ -101,6 +140,7 @@ fun NewEventScreen(userId: Int) {
                                     .padding(bottom = 8.dp)
                             )
                         }
+                         */
                     } else {
                         // Display the placeholder image
                         Image(
@@ -130,22 +170,38 @@ fun NewEventScreen(userId: Int) {
 
         // 2. Row with Category Icon and a pull-down menu to select Category Name
         item {
-            CategoryRow()
+            if (fromEvent != null) {
+                CategoryRow(fromEvent)
+            } else {
+                CategoryRow()
+            }
         }
 
         // 3. Row with Product icon and input box for text
         item {
-            TextInputRow(iconId = R.drawable.product, hint = "Product Description")
-            { newValue ->
-                // Handle value change
+            if (fromEvent != null) {
+                TextInputRow(iconId = R.drawable.product, hint = "Product Description", initialText = fromEvent.productName ?: "") { newValue ->
+                    // Handle value change
+                }
+            } else {
+                TextInputRow(iconId = R.drawable.product, hint = "Product Description")
+                { newValue ->
+                    // Handle value change
+                }
             }
         }
 
         // 4. Row with Location icon and input box for text
         item {
-            TextInputRow(iconId = R.drawable.location, hint = "Location")
-            { newValue ->
-                // Handle value change
+            if (fromEvent != null) {
+                TextInputRow(iconId = R.drawable.location, hint = "Location", initialText = fromEvent.location ?: "") { newValue ->
+                    // Handle value change
+                }
+            } else {
+                TextInputRow(iconId = R.drawable.location, hint = "Location")
+                { newValue ->
+                    // Handle value change
+                }
             }
         }
 
@@ -157,15 +213,49 @@ fun NewEventScreen(userId: Int) {
             }
         }
 
-        // 6. Row with Calendar icon and date pickers
+        // 6. Row with Calendar icon and date inputs
         item {
-            DateRangePickerRow(
-                firstSelectedDate = firstSelectedDate,
-                onFirstDateSelected = { firstSelectedDate = it },
-                secondSelectedDate = secondSelectedDate,
-                onSecondDateSelected = { secondSelectedDate = it }
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            ) {
+                // Calendar icon
+                Image(
+                    painter = painterResource(id = R.drawable.calendar),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // First date input field (non-editable)
+                Box(
+                    modifier = Modifier
+                        .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.medium)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .clickable { /* Empty onClick lambda to prevent interaction */ }
+                        .weight(1f)
+                ) {
+                    // Display the selected date
+                    Text(
+                        text = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(firstSelectedDate),
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // "To" text
+                Text(text = "to", modifier = Modifier.align(Alignment.CenterVertically))
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Second date input field
+                DateInputField(selectedDate = mutableStateOf(secondSelectedDate), modifier = Modifier.weight(1f))
+            }
         }
+
 
         // 7. Row with Money icon and input box for price
         item {
@@ -184,10 +274,15 @@ fun NewEventScreen(userId: Int) {
     }
 }
 
+
 @Composable
-fun CategoryRow() {
+fun CategoryRow(fromEvent: Event? = null) {
     var selectedCategory by remember { mutableStateOf(Datasource.categoryList[0]) }
     var expanded by remember { mutableStateOf(false) }
+
+    if(fromEvent != null) {
+        selectedCategory = Datasource.categoryList.find { it.categoryId == fromEvent.categoryId }!!
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -254,6 +349,7 @@ fun CategoryRow() {
 fun TextInputRow(
     iconId: Int,
     hint: String,
+    initialText: String = "",
     maxInputLength: Int = 30, // Maximum input length
     onValueChange: (String) -> Unit // Callback for value change
 ) {
@@ -275,7 +371,7 @@ fun TextInputRow(
         Spacer(modifier = Modifier.width(8.dp))
 
         // Input field
-        var text by remember { mutableStateOf(TextFieldValue()) }
+        var text by remember { mutableStateOf(TextFieldValue(initialText)) }
 
         OutlinedTextField(
             value = text,
@@ -375,158 +471,22 @@ fun PeopleInputRow(
     }
 }
 
+
 @Composable
-fun DatePicker(
-    selectedDate: Calendar,
-    onDateChange: (Calendar) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = modifier.clickable { showDialog = true }
-    ) {
-        OutlinedTextField(
-            value = selectedDate.time.toFormattedString(),
-            onValueChange = { },
-            readOnly = true,
-            label = { Text("Date") },
-            modifier = modifier
-        )
-    }
-
-    if (showDialog) {
-        DatePickerDialog(
-            selectedDate = selectedDate,
-            onDismissRequest = { showDialog = false },
-            onSelectDate = {
-                onDateChange(it)
-                showDialog = false
-            }
-        )
-    }
-}
-
-
-
-fun Date.toFormattedString(): String {
+fun DateInputField(selectedDate: MutableState<Date>, modifier: Modifier = Modifier) {
     val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-    return dateFormat.format(this)
-}
 
-
-@Composable
-fun DateRangePickerRow(
-    firstSelectedDate: Calendar,
-    onFirstDateSelected: (Calendar) -> Unit,
-    secondSelectedDate: Calendar,
-    onSecondDateSelected: (Calendar) -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp)
-    ) {
-        // Calendar icon
-        Image(
-            painter = painterResource(id = R.drawable.calendar),
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // First date picker
-        DatePicker(
-            selectedDate = firstSelectedDate,
-            onDateChange = onFirstDateSelected,
-            modifier = Modifier.weight(1f)
-        )
-
-        // "To" text
-        Text(text = "to", modifier = Modifier.padding(horizontal = 8.dp))
-
-        // Second date picker
-        DatePicker(
-            selectedDate = secondSelectedDate,
-            onDateChange = onSecondDateSelected,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-
-@Composable
-fun DatePickerDialog(
-    selectedDate: Calendar,
-    onDismissRequest: () -> Unit,
-    onSelectDate: (Calendar) -> Unit
-) {
-    var tempSelectedDate by remember { mutableStateOf(selectedDate.clone() as Calendar) }
-
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onSelectDate(tempSelectedDate)
-                    onDismissRequest()
-                }
-            ) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismissRequest
-            ) {
-                Text("Cancel")
-            }
-        },
-        title = {
-            Text("Select Date")
-        },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CalendarView(
-                    selectedDate = tempSelectedDate,
-                    onDateSelected = { tempSelectedDate = it }
-                )
-            }
-        }
+    OutlinedTextField(
+        value = dateFormat.format(selectedDate.value),
+        onValueChange = { /* No-op */ }, // Disable text input
+        readOnly = true, // Make the text field read-only
+        label = { /* Label text */ },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ),
+        modifier = modifier
     )
-}
 
-@Composable
-fun CalendarView(
-    selectedDate: Calendar,
-    onDateSelected: (Calendar) -> Unit
-) {
-    // You can implement your custom calendar view here
-    // This is just a placeholder
-    Text("Custom calendar view")
-}
-
-
-@Preview
-@Composable
-fun PreviewDatePicker() {
-    val selectedDate = remember { Calendar.getInstance() }
-    DatePicker(
-        selectedDate = selectedDate,
-        onDateChange = { newDate ->
-            // Update the selectedDate with the new date
-            selectedDate.apply {
-                timeInMillis = newDate.timeInMillis
-            }
-            // Print the selected date for demonstration
-            println("Selected date: ${selectedDate.time}")
-        }
-    )
 }
 
 
@@ -542,6 +502,6 @@ fun PriceInputRow(
 @Composable
 fun NewEventScreenPreview() {
     ShoppingBuddyAppTheme {
-        NewEventScreen(userId = 2)
+        NewEventScreen(userId = 2, eventId = -1)
     }
 }

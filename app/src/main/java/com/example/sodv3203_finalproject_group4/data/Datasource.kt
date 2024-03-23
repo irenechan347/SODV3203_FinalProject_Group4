@@ -85,7 +85,7 @@ object Datasource {
             10.00,
             "JaneSmith",
             EventStatus.Completed,
-            false,
+            true,
             R.drawable.img_event_9
         ),
         Event(
@@ -127,7 +127,7 @@ object Datasource {
             32.0,
             "Bruce787",
             EventStatus.Available,
-            false,
+            true,
             R.drawable.img_event_6
         ),
         Event(
@@ -141,7 +141,7 @@ object Datasource {
             32.0,
             "Bruce787",
             EventStatus.Available,
-            false,
+            true,
             R.drawable.img_event_6
         ),
 
