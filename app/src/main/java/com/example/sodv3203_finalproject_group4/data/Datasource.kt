@@ -20,11 +20,27 @@ object Datasource {
         events.add(event)
     }
 
-    val users = listOf(
+    // Function to get user by ID
+    fun getUser(userId: Int): User {
+        return users.find { it.userId == userId } ?: throw NoSuchElementException("User with ID $userId not found")
+    }
+
+
+
+    val users = mutableListOf(
         User(1, "Oliver", "Oliver Johnson", "oliver@mybvc.ca", "+1 403 123 4567"),
         User(2, "Emma", "Emma Thompson", "emma@mybvc.ca", "+1 403 765 4321"),
         // Add more User objects as needed
     )
+
+    fun updateUser(userId: Int, updatedUser: User) {
+        // Find the index of the user with the given userId
+        val index = users.indexOfFirst { it.userId == userId }
+        if (index != -1) {
+            // Update the user data at the found index
+            users[index] = updatedUser
+        }
+    }
 
     val categoryList = listOf(
         EventCategory(1, R.string.cat_batteries),
@@ -152,6 +168,5 @@ object Datasource {
             true,
             R.drawable.img_event_6
         ),
-
     )
 }

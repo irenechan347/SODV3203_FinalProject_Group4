@@ -25,16 +25,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sodv3203_finalproject_group4.data.Datasource
+import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 
 @Composable
 fun ProfileScreen(navController: NavController, userId:Int) {
-    var username by remember { mutableStateOf("") }
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var bio by remember { mutableStateOf("") }
+    var users = Datasource.users.toMutableList()
+    val user = users.find { it.userId == userId } ?: User(-1, "", "", "", "") // Default user if not found
+    //var user = Datasource.getUser(userId)
+    var displayName by remember { mutableStateOf(user.displayName) }
+    var name by remember { mutableStateOf(user.name) }
+    //var lastName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(user.email) }
+    var phoneNo  by remember { mutableStateOf(user.phoneNo) }
+    var userIndex = users.indexOfFirst { it.userId == userId }
+
 
     /*
     Surface(
@@ -45,20 +52,28 @@ fun ProfileScreen(navController: NavController, userId:Int) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // Display user's display name
+            Text(
+                text = user.displayName,
+                style = MaterialTheme.typography.h5,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
             // Group 4 and Email (Centered)
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Group 4
+                /* Group 4
                 Text(
                     text = "Oliver",
                     style = MaterialTheme.typography.h5
-                )
+                )*/
                 Spacer(modifier = Modifier.height(4.dp))
                 // Email
                 Text(
-                    text = "oliver@mybvc.ca",
+                    //text = "oliver@mybvc.ca",
+                    text = user.email,
                     style = MaterialTheme.typography.body1
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -93,25 +108,25 @@ fun ProfileScreen(navController: NavController, userId:Int) {
 
             Column(modifier = Modifier.padding(16.dp)) {
                 OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    label = { Text("Username") },
+                    value = displayName,
+                    onValueChange = { displayName = it },
+                    label = { Text("Display Name") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = firstName,
-                    onValueChange = { firstName = it },
-                    label = { Text("First Name") },
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("name") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
+                /*OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = { Text("Last Name") },
                     modifier = Modifier.fillMaxWidth()
-                )
+                )*/
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = email,
@@ -121,15 +136,25 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = bio,
-                    onValueChange = { bio = it },
-                    label = { Text("Bio") },
+                    value = phoneNo,
+                    onValueChange = { phoneNo = it },
+                    label = { Text("Phone Number") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        // Perform action on button click
+                        if (userIndex != -1) { // Ensure user exists in the list
+                            users[userIndex] = user.copy(
+                                displayName = displayName,
+                                name = name,
+                                email = email,
+                                phoneNo = phoneNo
+                            )
+                            // Notify DataSource about the update
+
+                            Datasource.updateUser(user.userId, users[userIndex]) // Update the user in the Datasource
+                        }
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
