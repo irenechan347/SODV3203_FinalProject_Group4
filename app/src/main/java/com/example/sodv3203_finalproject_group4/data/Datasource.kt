@@ -20,6 +20,15 @@ object Datasource {
         events.add(event)
     }
 
+
+    // Function to update the joined users list for a specific event
+    fun updateEventList(updatedEvent: Event) {
+        val index = events.indexOfFirst { it.eventId == updatedEvent.eventId }
+        if (index != -1) {
+            events[index] = updatedEvent
+        }
+    }
+
     val users = listOf(
         User(1, "Oliver", "Oliver Johnson", "oliver@mybvc.ca", "+1 403 123 4567"),
         User(2, "Emma", "Emma Thompson", "emma@mybvc.ca", "+1 403 765 4321"),

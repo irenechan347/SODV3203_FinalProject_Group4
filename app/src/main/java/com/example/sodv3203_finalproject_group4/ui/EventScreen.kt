@@ -34,6 +34,16 @@ fun EventScreen(userId: Int, eventId: Int) {
     val event = remember { Datasource.eventList.firstOrNull { it.eventId == eventId } }
 
     if (event != null) {
+        val joinedUsers = event.joinedUsers.mapNotNull { userId -> Datasource.users.firstOrNull { it.userId == userId } }
+        val isUserJoined = event.joinedUsers.contains(userId)
+
+        // Define updatedEvent based on whether the user is already joined or not
+        val updatedEvent = if (!isUserJoined) {
+            event.copy(joinedUsers = event.joinedUsers + userId)
+        } else {
+            event // No need to update if user is already joined
+        }
+
         LazyColumn(modifier = Modifier.fillMaxSize().padding(10.dp)) {
             item {
                 Box(
@@ -113,12 +123,43 @@ fun EventScreen(userId: Int, eventId: Int) {
                 )
             }
 
+            // Display joined users
             item {
-                Button(
-                    onClick = { /* Functionality to join the event */ },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Join")
+                Text(
+                    text = "Joined Users:",
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+            joinedUsers.forEach { user ->
+                item {
+                    Text(
+                        text = "- ${user.displayName}",
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+
+            // Join button
+            if (!isUserJoined && joinedUsers.size < event.currHeadCount) {
+                item {
+                    Button(
+                        onClick = {
+                            val updatedEventList = Datasource.eventList.map {
+                                if (it.eventId == eventId) {
+                                    it.copy(joinedUsers = it.joinedUsers + userId)
+                                } else {
+                                    it
+                                }
+                            }
+                            // Update the eventList with the new list of joined users
+                            Datasource.updateEventList(updatedEvent)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Join")
+                    }
                 }
             }
         }

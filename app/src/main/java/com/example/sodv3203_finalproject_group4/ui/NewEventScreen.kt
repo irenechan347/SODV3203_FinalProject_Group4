@@ -573,11 +573,11 @@ fun PeopleInputRow(
                 val newValue = it.text
                 text = it
                 val intValue = newValue.toIntOrNull()
-                errorMessage = if (intValue != null && intValue in 1..5) {
+                errorMessage = if (intValue != null && intValue in 1..4) {
                     onNumberOfPeopleChange(intValue)
                     null // Clear error message if input is valid
                 } else {
-                    "Please enter a number between 1 and 5"
+                    "Please enter a number between 1 and 4"
                 }
             },
             placeholder = { Text(text = hint) },
