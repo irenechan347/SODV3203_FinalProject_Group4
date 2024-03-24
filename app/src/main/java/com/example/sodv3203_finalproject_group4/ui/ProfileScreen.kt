@@ -29,18 +29,19 @@ import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController, userId:Int) {
     var username by remember { mutableStateOf("") }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var bio by remember { mutableStateOf("") }
 
+    /*
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
-    ) {
-        Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
+    ) {*/
+    Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
@@ -179,9 +180,9 @@ fun ProfileScreen(navController: NavController) {
                 Text("Logout")
             }
         }
-        }
     }
 }
+/*}*/
 @Composable
 fun ProfileInformationField(label: String, value: String) {
     Row(
@@ -207,6 +208,6 @@ fun ProfileInformationField(label: String, value: String) {
 @Composable
 fun ProfileScreenPreview() {
     ShoppingBuddyAppTheme {
-        ProfileScreen(navController = rememberNavController())
+        ProfileScreen(navController = rememberNavController(), 2)
     }
 }
