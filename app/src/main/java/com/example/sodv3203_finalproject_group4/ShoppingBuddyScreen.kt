@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,12 +24,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,8 +43,6 @@ import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import com.example.sodv3203_finalproject_group4.ui.BookmarkScreen
 import com.example.sodv3203_finalproject_group4.ui.HistoryScreen
 import com.example.sodv3203_finalproject_group4.ui.HomeScreen
@@ -269,7 +263,7 @@ fun ShoppingBuddyApp(
             composable("eventScreen/{userId}/{eventId}") { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
                 val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: throw IllegalArgumentException("Event ID not found")
-                EventScreen(userId = userId, eventId = eventId)
+                EventScreen(userId = userId, eventId = eventId,)
             }
 
             composable(route = "${ShoppingBuddyScreen.History.name}/{userId}") {backStackEntry ->

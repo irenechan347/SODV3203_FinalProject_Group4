@@ -23,5 +23,6 @@ data class Event(
     val eventBy: String,
     val status: EventStatus,
     val isBookmark: Boolean,
-    @DrawableRes val imageId: Int
+    @DrawableRes val imageId: Int,
+    val joinedUsers: List<Int> = emptyList()
 )

@@ -30,6 +30,8 @@ object Datasource {
     val users = mutableListOf(
         User(1, "Oliver", "Oliver Johnson", "oliver@mybvc.ca", "+1 403 123 4567"),
         User(2, "Emma", "Emma Thompson", "emma@mybvc.ca", "+1 403 765 4321"),
+        User(3, "Sally", "Sally Thomas", "sally@mybvc.ca", "+1 403 765 4444"),
+        User(4, "John", "John Owen", "john@mybvc.ca", "+1 403 765 3333"),
         // Add more User objects as needed
     )
 
@@ -65,10 +67,11 @@ object Datasource {
             dateFormat.parse("2024-03-01"),
             dateFormat.parse("2024-03-31"),
             32.0,
-            "Bruce787",
+            "Oliver",
             EventStatus.Available,
             false,
-            R.drawable.img_event_1
+            R.drawable.img_event_1,
+            listOf(1,2,3)
         ),
         Event(
             2,
@@ -82,7 +85,8 @@ object Datasource {
             "Sally",
             EventStatus.Joined,
             true,
-            R.drawable.img_event_2
+            R.drawable.img_event_2,
+            listOf(1,2,3,4)
         ),
         Event(
             3,
@@ -93,10 +97,11 @@ object Datasource {
             dateFormat.parse("2024-03-10"),
             dateFormat.parse("2024-03-20"),
             5.00,
-            "JohnDoe",
+            "Sally",
             EventStatus.Paid,
             false,
-            R.drawable.img_event_8
+            R.drawable.img_event_8,
+            listOf(1,4)
         ),
         Event(
             4,
@@ -107,10 +112,11 @@ object Datasource {
             dateFormat.parse("2024-03-12"),
             dateFormat.parse("2024-03-25"),
             10.00,
-            "JaneSmith",
+            "Emma",
             EventStatus.Completed,
             true,
-            R.drawable.img_event_9
+            R.drawable.img_event_9,
+            listOf(2)
         ),
         Event(
             5,
@@ -121,10 +127,11 @@ object Datasource {
             dateFormat.parse("2024-03-16"),
             dateFormat.parse("2024-03-22"),
             30.00,
-            "Sally",
+            "John",
             EventStatus.Cancelled,
             false,
-            R.drawable.img_event_4
+            R.drawable.img_event_4,
+            listOf(4)
         ),
         Event(
             6,
@@ -135,10 +142,11 @@ object Datasource {
             dateFormat.parse("2024-03-01"),
             dateFormat.parse("2024-03-31"),
             32.0,
-            "Bruce787",
+            "Emma",
             EventStatus.Available,
             false,
-            R.drawable.img_event_5
+            R.drawable.img_event_5,
+            listOf(2,3)
         ),
         Event(
             7,
@@ -149,10 +157,11 @@ object Datasource {
             dateFormat.parse("2024-03-01"),
             dateFormat.parse("2024-03-31"),
             32.0,
-            "Bruce787",
+            "John",
             EventStatus.Available,
             true,
-            R.drawable.img_event_6
+            R.drawable.img_event_6,
+            listOf(2,4)
         ),
         Event(
             8,
@@ -163,10 +172,11 @@ object Datasource {
             dateFormat.parse("2024-03-01"),
             dateFormat.parse("2024-03-31"),
             32.0,
-            "Bruce787",
+            "Sally",
             EventStatus.Available,
             true,
-            R.drawable.img_event_6
+            R.drawable.img_event_6,
+            listOf(1,3)
         ),
     )
 }
