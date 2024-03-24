@@ -1,139 +1,175 @@
-package com.example.sodv3203_finalproject_group4.ui
+package com.example.sodv3203_finalproject_group4.data
 
-
-import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.sodv3203_finalproject_group4.R
-import com.example.sodv3203_finalproject_group4.data.Datasource
-import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
+import com.example.sodv3203_finalproject_group4.model.Event
+import com.example.sodv3203_finalproject_group4.model.EventCategory
+import com.example.sodv3203_finalproject_group4.model.EventStatus
+import com.example.sodv3203_finalproject_group4.model.User
 import java.text.SimpleDateFormat
-import java.util.Locale
 
-@SuppressLint("UnrememberedMutableState")
-@Composable
-fun EventScreen(userId: Int, eventId: Int) {
-    val event = remember { Datasource.eventList.firstOrNull { it.eventId == eventId } }
+import java.util.Date
 
-    if (event != null) {
-        val joinedUsers = event.joinedUsers.mapNotNull { userId -> Datasource.users.firstOrNull { it.userId == userId } }
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(10.dp)) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .size(140.dp)
-                        .padding(bottom = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = event.imageId),
-                        contentDescription = "Event Image",
-                        modifier = Modifier
-                            .size(140.dp)
-                            .padding(bottom = 8.dp)
-                    )
-                }
-            }
-            item {
-                CategoryRow(
-                    selectedCategory = Datasource.categoryList.find { it.categoryId == event.categoryId },
-                    onCategorySelected = { /* Not applicable for EventScreen */ },
-                    fromEvent = event,
-                    selectedCategoryId = event.categoryId,
-                    categoryMap = Datasource.categoryMap
-                )
-            }
-            item {
-                TextInputRow(
-                    iconId = R.drawable.product,
-                    hint = "Product Description",
-                    initialText = event.productName ?: ""
-                ) { /* Not applicable for EventScreen */ }
-            }
-            item {
-                TextInputRow(
-                    iconId = R.drawable.location,
-                    hint = "Location",
-                    initialText = event.location ?: ""
-                ) { /* Not applicable for EventScreen */ }
-            }
-            item {
-                Text(
-                    text = "Number of People: ${event.currHeadCount}",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.calendar),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "From: ${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(event.dateFrom)}",
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "to: ${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(event.dateTo)}",
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-            item {
-                Text(
-                    text = "Price per share: $${String.format("%.1f", event.price / event.currHeadCount)}",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
+private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 
-            item {
-                Button(
-                    onClick = { /* Functionality to join the event */ },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Join")
-                }
-            }
+object Datasource {
+    // Define a mutable list to hold the events
+    private val events = mutableListOf<Event>()
+
+    // Function to add a new event to the list
+    fun addEvent(event: Event) {
+        events.add(event)
+    }
+
+    // Function to update the joined users list for a specific event
+    fun updateEventList(updatedEvent: Event) {
+        val index = events.indexOfFirst { it.eventId == updatedEvent.eventId }
+        if (index != -1) {
+            events[index] = updatedEvent
         }
-    } else {
-        Text(text = "Event not found", modifier = Modifier.padding(16.dp))
     }
-}
+    val users = listOf(
+        User(1, "Oliver", "Oliver Johnson", "oliver@mybvc.ca", "+1 403 123 4567"),
+        User(2, "Emma", "Emma Thompson", "emma@mybvc.ca", "+1 403 765 4321"),
+        User(3, "Sally", "Sally Thomas", "sally@mybvc.ca", "+1 403 765 4444"),
+        User(4, "John", "John Owen", "john@mybvc.ca", "+1 403 765 3333"),
+        // Add more User objects as needed
+    )
 
+    val categoryList = listOf(
+        EventCategory(1, R.string.cat_batteries),
+        EventCategory(2, R.string.cat_bakery),
+        EventCategory(3, R.string.cat_fruits),
+        //EventCategory(4, R.string.cat_others)
+    )
 
-@Preview
-@Composable
-fun EventScreenPreview() {
-    ShoppingBuddyAppTheme {
-        EventScreen(2, 2,)
-    }
+    val categoryMap = mapOf(
+        1 to "Batteries",
+        2 to "Bakery",
+        3 to "Fruits",
+    )
+
+    val eventList = listOf(
+        Event(
+            1,
+            1,
+            "Duracell  2A x 60 pcs",
+            "Sage Hill",
+            3,
+            dateFormat.parse("2024-03-01"),
+            dateFormat.parse("2024-03-31"),
+            32.0,
+            "Oliver",
+            EventStatus.Available,
+            false,
+            R.drawable.img_event_1,
+            listOf(1,2,3)
+        ),
+        Event(
+            2,
+            3,
+            "Cherry x 3kg",
+            "City Hall",
+            4,
+            dateFormat.parse("2024-03-01"),
+            dateFormat.parse("2024-03-31"),
+            30.0,
+            "Sally",
+            EventStatus.Joined,
+            true,
+            R.drawable.img_event_2,
+            listOf(1,2,3,4)
+        ),
+        Event(
+            3,
+            2,  // Category ID
+            "Whole Grain Bread (2 Loaves)",  // Title
+            "The Baker's Corner",
+            3,
+            dateFormat.parse("2024-03-10"),
+            dateFormat.parse("2024-03-20"),
+            5.00,
+            "Sally",
+            EventStatus.Paid,
+            false,
+            R.drawable.img_event_8,
+            listOf(1,4)
+        ),
+        Event(
+            4,
+            2,  // Category ID (Same as above)
+            "Organic Flour (5kg Bag)",
+            "The Miller's Mill",
+            2,
+            dateFormat.parse("2024-03-12"),
+            dateFormat.parse("2024-03-25"),
+            10.00,
+            "Emma",
+            EventStatus.Completed,
+            true,
+            R.drawable.img_event_9,
+            listOf(2)
+        ),
+        Event(
+            5,
+            3,  // Category ID (Same as above)
+            "Water Melon (10 Pcs)",
+            "Herron Mews",
+            2,
+            dateFormat.parse("2024-03-16"),
+            dateFormat.parse("2024-03-22"),
+            30.00,
+            "John",
+            EventStatus.Cancelled,
+            false,
+            R.drawable.img_event_4,
+            listOf(4)
+        ),
+        Event(
+            6,
+            1,
+            "Duracell  2A x 60 pcs",
+            "Sage Hill",
+            3,
+            dateFormat.parse("2024-03-01"),
+            dateFormat.parse("2024-03-31"),
+            32.0,
+            "Emma",
+            EventStatus.Available,
+            false,
+            R.drawable.img_event_5,
+            listOf(2,3)
+        ),
+        Event(
+            7,
+            1,
+            "Duracell  2A x 60 pcs",
+            "Sage Hill",
+            3,
+            dateFormat.parse("2024-03-01"),
+            dateFormat.parse("2024-03-31"),
+            32.0,
+            "John",
+            EventStatus.Available,
+            true,
+            R.drawable.img_event_6,
+            listOf(2,4)
+        ),
+        Event(
+            8,
+            1,
+            "Duracell  2A x 60 pcs",
+            "Sage Hill",
+            3,
+            dateFormat.parse("2024-03-01"),
+            dateFormat.parse("2024-03-31"),
+            32.0,
+            "Sally",
+            EventStatus.Available,
+            true,
+            R.drawable.img_event_6,
+            listOf(1,3)
+        ),
+
+        )
 }
 
