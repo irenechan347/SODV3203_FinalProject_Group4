@@ -87,6 +87,17 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
         selectedCategoryId = category.categoryId
     }
 
+    // Define a state variable to hold the product name
+    var productName by remember { mutableStateOf("") }
+
+    // Define a mutable state variable to hold the location value
+    var location by remember { mutableStateOf("") }
+
+
+
+
+
+
     val fromEvent = remember {
         Datasource.eventList.find { it.eventId == eventId }
     }
@@ -213,30 +224,46 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
         }
 
 
-        // 3. Row with Product icon and input box for text
+        // 3. Row with Product icon and input box for the productName
         item {
             if (fromEvent != null) {
-                TextInputRow(iconId = R.drawable.product, hint = "Product Description", initialText = fromEvent.productName ?: "") { newValue ->
-                    // Handle value change
-                }
+                TextInputRow(
+                    iconId = R.drawable.product,
+                    hint = "Product Description",
+                    initialText = fromEvent.productName ?: "",
+                    onValueChange = { newValue ->
+                        productName = newValue
+                    }
+                )
             } else {
-                TextInputRow(iconId = R.drawable.product, hint = "Product Description")
-                { newValue ->
-                    // Handle value change
-                }
+                TextInputRow(
+                    iconId = R.drawable.product,
+                    hint = "Product Description",
+                    onValueChange = { newValue ->
+                        productName = newValue
+                    }
+                )
             }
         }
 
         // 4. Row with Location icon and input box for text
         item {
             if (fromEvent != null) {
-                TextInputRow(iconId = R.drawable.location, hint = "Location", initialText = fromEvent.location ?: "") { newValue ->
-                    // Handle value change
+                TextInputRow(
+                    iconId = R.drawable.location,
+                    hint = "Location",
+                    initialText = fromEvent.location ?: ""
+                ) { newValue ->
+                    // Update the location value when it changes
+                    location = newValue
                 }
             } else {
-                TextInputRow(iconId = R.drawable.location, hint = "Location")
-                { newValue ->
-                    // Handle value change
+                TextInputRow(
+                    iconId = R.drawable.location,
+                    hint = "Location"
+                ) { newValue ->
+                    // Update the location value when it changes
+                    location = newValue
                 }
             }
         }
@@ -317,16 +344,16 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
                     val newEvent = Event(
                         eventId = newEventId,
                         categoryId = selectedCategoryId!!,
-                        productName = "", // Fill with the actual product name
-                        location = "", // Fill with the actual location
-                        currHeadCount = 0, // Fill with the actual currHeadCount
-                        dateFrom = firstSelectedDate, // Use the selected first date
-                        dateTo = secondSelectedDate, // Use the selected second date
-                        price = price, // Use the calculated price
-                        eventBy = "Bruce787", // Use the provided userId
+                        productName = productName,
+                        location = location,
+                        currHeadCount = numberOfPeople,
+                        dateFrom = firstSelectedDate,
+                        dateTo = secondSelectedDate,
+                        price = price,
+                        eventBy = userId.toString(),
                         status = EventStatus.Available, // Default status
-                        isBookmark = true, // Default value
-                        imageId = fromEvent?.imageId ?: R.drawable.img_event_6 // Use the imageId from fromEvent if available, otherwise use the default image
+                        isBookmark = false, // Default value
+                        imageId = fromEvent?.imageId ?: R.drawable.img_event_1 // Use the imageId from fromEvent if available, otherwise use the default image
                     )
 
                     // Add the new event to the datasource
