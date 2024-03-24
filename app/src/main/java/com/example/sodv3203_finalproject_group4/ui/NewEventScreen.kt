@@ -79,13 +79,17 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
     var pricePerShare by remember { mutableDoubleStateOf(0.0) }
     pricePerShare = price / numberOfPeople
 
-    // Define a variable to hold the selected category ID
+// Define a variable to hold the selected category ID
     var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
+    var selectedCategory by remember { mutableStateOf<EventCategory?>(null) }
 
-    // Update selectedCategoryId when a category is selected
-    val onCategorySelected: (EventCategory) -> Unit = { category ->
-        selectedCategoryId = category.categoryId
+// Update selectedCategoryId and selectedCategory when a category is selected
+    val onCategorySelected: (EventCategory?) -> Unit = { category ->
+        selectedCategoryId = category?.categoryId // Update the selectedCategoryId with the categoryId of the selected category
+        selectedCategory = category // Update the selectedCategory state with the selected category
     }
+
+
 
     // Define a state variable to hold the product name
     var productName by remember { mutableStateOf("") }
@@ -212,16 +216,21 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
                 CategoryRow(
                     selectedCategory = Datasource.categoryList.find { it.categoryId == fromEvent.categoryId },
                     onCategorySelected = onCategorySelected,
-                    fromEvent = fromEvent
+                    fromEvent = fromEvent,
+                    selectedCategoryId = selectedCategoryId,
+                    categoryMap = Datasource.categoryMap
                 )
             } else {
                 CategoryRow(
                     selectedCategory = null, // Initial value when no category is selected
                     onCategorySelected = onCategorySelected,
-                    fromEvent = null // Pass null for fromEvent when it is not available
+                    fromEvent = null, // Pass null for fromEvent when it is not available
+                    selectedCategoryId = selectedCategoryId,
+                    categoryMap = Datasource.categoryMap
                 )
             }
         }
+
 
 
         // 3. Row with Product icon and input box for the productName
@@ -339,8 +348,7 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
         // 8. Create button
         item {
             Button(onClick = {
-                if (selectedCategoryId != null && selectedCategoryId != 0) {
-                    // Category is selected, proceed to create the event
+
                     val newEvent = Event(
                         eventId = newEventId,
                         categoryId = selectedCategoryId!!,
@@ -358,10 +366,7 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
                     // Add the new event to the datasource
                     Datasource.addEvent(newEvent)
-                } else {
-                    // Category is not selected, show error message or handle the scenario accordingly
-                    // For example, display a Snackbar to inform the user to select a category
-                }
+
             }) {
                 Text(text = "Create", modifier = Modifier.padding(horizontal = 16.dp))
             }
@@ -369,12 +374,13 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
     }
 }
 
-
 @Composable
 fun CategoryRow(
     selectedCategory: EventCategory?,
-    onCategorySelected: (EventCategory) -> Unit,
-    fromEvent: Event? = null
+    onCategorySelected: (EventCategory?) -> Unit,
+    fromEvent: Event?,
+    selectedCategoryId: Int?,
+    categoryMap: Map<Int, String>
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -407,7 +413,9 @@ fun CategoryRow(
             ) {
                 // Display selected category name
                 Text(
-                    text = selectedCategory?.let { stringResource(id = it.categoryName) } ?: "Select Category",
+                    text = selectedCategoryId?.let { categoryId ->
+                        categoryMap[categoryId] ?: "Select Category"
+                    } ?: "Select Category",
                     style = MaterialTheme.typography.body1,
                     modifier = Modifier.weight(1f)
                 )
@@ -438,6 +446,8 @@ fun CategoryRow(
         }
     }
 }
+
+
 
 
 @Composable
