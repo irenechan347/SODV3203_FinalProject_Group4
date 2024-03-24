@@ -45,11 +45,10 @@ import com.example.sodv3203_finalproject_group4.model.EventCategory
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import java.text.SimpleDateFormat
 import kotlin.math.ceil
-
+import android.util.Log
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-
 fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
     // Find the maximum event ID from the existing event list
@@ -85,11 +84,10 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
 // Update selectedCategoryId and selectedCategory when a category is selected
     val onCategorySelected: (EventCategory?) -> Unit = { category ->
-        selectedCategoryId = category?.categoryId // Update the selectedCategoryId with the categoryId of the selected category
+        selectedCategoryId =
+            category?.categoryId // Update the selectedCategoryId with the categoryId of the selected category
         selectedCategory = category // Update the selectedCategory state with the selected category
     }
-
-
 
     // Define a state variable to hold the product name
     var productName by remember { mutableStateOf("") }
@@ -97,22 +95,21 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
     // Define a mutable state variable to hold the location value
     var location by remember { mutableStateOf("") }
 
-
-
-
-
+    // Define a mutable state for showDialog
+    var showDialog by remember { mutableStateOf(false) }
 
     val fromEvent = remember {
         Datasource.eventList.find { it.eventId == eventId }
     }
 
-    val chooseImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
-        uri?.let {
-            // Handle the selected image URI
-            selectedImageUri = it.toString()
-            isPhotoUploaded = true
+    val chooseImageLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                // Handle the selected image URI
+                selectedImageUri = it.toString()
+                isPhotoUploaded = true
+            }
         }
-    }
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = "User ID: $userId", style = MaterialTheme.typography.h6)
         // This is just to verify that now userId is available
@@ -232,7 +229,6 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
         }
 
 
-
         // 3. Row with Product icon and input box for the productName
         item {
             if (fromEvent != null) {
@@ -315,7 +311,9 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
                 ) {
                     // Display the selected date
                     Text(
-                        text = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(firstSelectedDate),
+                        text = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
+                            firstSelectedDate
+                        ),
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
@@ -329,7 +327,10 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
                 Spacer(modifier = Modifier.width(8.dp))
 
                 // Second date input field
-                DateInputField(selectedDate = mutableStateOf(secondSelectedDate), modifier = Modifier.weight(1f))
+                DateInputField(
+                    selectedDate = mutableStateOf(secondSelectedDate),
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
 
@@ -347,32 +348,57 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
         // 8. Create button
         item {
-            Button(onClick = {
-
-                    val newEvent = Event(
-                        eventId = newEventId,
-                        categoryId = selectedCategoryId!!,
-                        productName = productName,
-                        location = location,
-                        currHeadCount = numberOfPeople,
-                        dateFrom = firstSelectedDate,
-                        dateTo = secondSelectedDate,
-                        price = price,
-                        eventBy = userId.toString(),
-                        status = EventStatus.Available, // Default status
-                        isBookmark = false, // Default value
-                        imageId = fromEvent?.imageId ?: R.drawable.img_event_1 // Use the imageId from fromEvent if available, otherwise use the default image
-                    )
-
-                    // Add the new event to the datasource
-                    Datasource.addEvent(newEvent)
-
-            }) {
-                Text(text = "Create", modifier = Modifier.padding(horizontal = 16.dp))
+            CreateButton(
+                newEventId = newEventId,
+                selectedCategoryId = selectedCategoryId,
+                productName = productName,
+                location = location,
+                numberOfPeople = numberOfPeople,
+                firstSelectedDate = firstSelectedDate,
+                secondSelectedDate = secondSelectedDate,
+                price = price,
+                userId = userId,
+                fromEvent = fromEvent,
+                onEventCreated = { showDialog = true }
+            )
+            // Show dialog if showDialog is true
+            if (showDialog) {
+                ShowDataSentDialog(onDismiss = { showDialog = false })
             }
         }
     }
 }
+
+@Composable
+fun ShowDataSentDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Data Sent") },
+        text = { Text("The data has been successfully sent to the database.") },
+        confirmButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("OK")
+            }
+        }
+    )
+}
+
+@Composable
+fun MissingFieldsDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Missing Fields") },
+        text = { Text("Please fill in all required fields.") },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("OK")
+            }
+        }
+    )
+}
+
 
 @Composable
 fun CategoryRow(
@@ -673,6 +699,79 @@ fun PriceInputRow(
     }
 }
 
+@Composable
+fun CreateButton(
+    newEventId: Int,
+    selectedCategoryId: Int?,
+    productName: String,
+    location: String,
+    numberOfPeople: Int,
+    firstSelectedDate: Date,
+    secondSelectedDate: Date,
+    price: Double,
+    userId: Int,
+    fromEvent: Event?,
+    onEventCreated: () -> Unit
+) {
+    // Format the dates to YYYYMMDD format
+    val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+    val formattedFirstDate = dateFormat.format(firstSelectedDate)
+    val formattedSecondDate = dateFormat.format(secondSelectedDate)
+    var showDialog by remember { mutableStateOf(false) }
+
+    Button(onClick = {
+        Log.d("CreateButton", "Button clicked")
+        Log.d("CreateButton", "newEventId: $newEventId")
+        Log.d("CreateButton", "selectedCategoryId: $selectedCategoryId")
+        Log.d("CreateButton", "productName: $productName")
+        Log.d("CreateButton", "location: $location")
+        Log.d("CreateButton", "numberOfPeople: $numberOfPeople")
+        Log.d("CreateButton", "firstSelectedDate: $formattedFirstDate")
+        Log.d("CreateButton", "secondSelectedDate: $formattedSecondDate")
+        Log.d("CreateButton", "price: $price")
+        Log.d("CreateButton", "userId: $userId")
+        Log.d("CreateButton", "fromEvent: $fromEvent")
+
+        // Check if selectedCategoryId is not null and other required fields are not empty
+        if (selectedCategoryId != null && productName.isNotBlank() && location.isNotBlank() && numberOfPeople>0 && price>0) {
+            // Create the event
+            val newEvent = Event(
+                eventId = newEventId,
+                categoryId = selectedCategoryId!!,
+                productName = productName,
+                location = location,
+                currHeadCount = numberOfPeople,
+                dateFrom = dateFormat.parse(formattedFirstDate),
+                dateTo = dateFormat.parse(formattedSecondDate),
+                price = price,
+                eventBy = userId.toString(),
+                status = EventStatus.Available, // Default status
+                isBookmark = false, // Default value
+                imageId = fromEvent?.imageId
+                    ?: R.drawable.img_event_1 // Use the imageId from fromEvent if available, otherwise use the default image
+            )
+
+            // Add the new event to the datasource
+            Datasource.addEvent(newEvent)
+
+            // Call the callback function to notify that event is created
+            onEventCreated()
+        } else {
+            // Log a message or show an error indicating that required fields are missing
+            showDialog = true
+            Log.d("CreateButton", "Some required fields are missing.")
+        }
+    }) {
+        Text(text = "Create", modifier = Modifier.padding(horizontal = 16.dp))
+    }
+
+    if (showDialog) {
+        MissingFieldsDialog(onDismiss = { showDialog = false })
+    }
+}
+
+
+
 
 @Preview
 @Composable
@@ -681,3 +780,4 @@ fun NewEventScreenPreview() {
         NewEventScreen(userId = 2, eventId = -1)
     }
 }
+
