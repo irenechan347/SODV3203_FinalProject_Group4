@@ -12,6 +12,14 @@ import java.util.Date
 private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 
 object Datasource {
+    // Define a mutable list to hold the events
+    private val events = mutableListOf<Event>()
+
+    // Function to add a new event to the list
+    fun addEvent(event: Event) {
+        events.add(event)
+    }
+
     val users = listOf(
         User(1, "Oliver", "Oliver Johnson", "oliver@mybvc.ca", "+1 403 123 4567"),
         User(2, "Emma", "Emma Thompson", "emma@mybvc.ca", "+1 403 765 4321"),

@@ -38,14 +38,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import coil.compose.rememberImagePainter
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import com.example.sodv3203_finalproject_group4.model.Event
+import com.example.sodv3203_finalproject_group4.model.EventCategory
+import com.example.sodv3203_finalproject_group4.model.EventStatus
 import java.text.SimpleDateFormat
+import kotlin.math.ceil
 
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 
 fun NewEventScreen(userId: Int, eventId: Int = -1) {
+
+    // Find the maximum event ID from the existing event list
+    val maxEventId = Datasource.eventList.maxOfOrNull { it.eventId } ?: 0
+
+    // Increment the maximum event ID by 1 to generate a new event ID
+    val newEventId = maxEventId + 1
 
     // Initialize firstSelectedDate to today's date
     val today = Date()
@@ -59,6 +70,22 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
     var isPhotoUploaded by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<String?>(null) }
+
+    // Define state variables for the number of people and the price
+    var numberOfPeople by remember { mutableIntStateOf(1) }
+    var price by remember { mutableDoubleStateOf(0.0) }
+
+    // Calculate price per share based on the input values
+    var pricePerShare by remember { mutableDoubleStateOf(0.0) }
+    pricePerShare = price / numberOfPeople
+
+    // Define a variable to hold the selected category ID
+    var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
+
+    // Update selectedCategoryId when a category is selected
+    val onCategorySelected: (EventCategory) -> Unit = { category ->
+        selectedCategoryId = category.categoryId
+    }
 
     val fromEvent = remember {
         Datasource.eventList.find { it.eventId == eventId }
@@ -171,11 +198,20 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
         // 2. Row with Category Icon and a pull-down menu to select Category Name
         item {
             if (fromEvent != null) {
-                CategoryRow(fromEvent)
+                CategoryRow(
+                    selectedCategory = Datasource.categoryList.find { it.categoryId == fromEvent.categoryId },
+                    onCategorySelected = onCategorySelected,
+                    fromEvent = fromEvent
+                )
             } else {
-                CategoryRow()
+                CategoryRow(
+                    selectedCategory = null, // Initial value when no category is selected
+                    onCategorySelected = onCategorySelected,
+                    fromEvent = null // Pass null for fromEvent when it is not available
+                )
             }
         }
+
 
         // 3. Row with Product icon and input box for text
         item {
@@ -207,10 +243,15 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
         // 5. Row with People icon and input box for number
         item {
-            PeopleInputRow(iconId = R.drawable.people, hint = "Number of People (1-5)")
-            { newValue ->
-                // Handle value change
-            }
+            PeopleInputRow(
+                iconId = R.drawable.people,
+                hint = "Number of People (1-5)",
+                onNumberOfPeopleChange = { newValue ->
+                    numberOfPeople = newValue
+                    // Recalculate price per share when the number of people changes
+                    pricePerShare = ceil(price / newValue * 10) / 10
+                }
+            )
         }
 
         // 6. Row with Calendar icon and date inputs
@@ -259,15 +300,42 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
         // 7. Row with Money icon and input box for price
         item {
-            PriceInputRow(iconId = R.drawable.dollar, hint = "Price per Person")
-            { newValue ->
-                // Handle value change
+            PriceInputRow(
+                iconId = R.drawable.dollar,
+                hint = "Product Price",
+                numberOfPeople = numberOfPeople,
+            ) { newValue ->
+                price = newValue
             }
         }
 
         // 8. Create button
         item {
-            Button(onClick = { /* Handle create button click */ }) {
+            Button(onClick = {
+                if (selectedCategoryId != null && selectedCategoryId != 0) {
+                    // Category is selected, proceed to create the event
+                    val newEvent = Event(
+                        eventId = newEventId,
+                        categoryId = selectedCategoryId!!,
+                        productName = "", // Fill with the actual product name
+                        location = "", // Fill with the actual location
+                        currHeadCount = 0, // Fill with the actual currHeadCount
+                        dateFrom = firstSelectedDate, // Use the selected first date
+                        dateTo = secondSelectedDate, // Use the selected second date
+                        price = price, // Use the calculated price
+                        eventBy = "Bruce787", // Use the provided userId
+                        status = EventStatus.Available, // Default status
+                        isBookmark = true, // Default value
+                        imageId = fromEvent?.imageId ?: R.drawable.img_event_6 // Use the imageId from fromEvent if available, otherwise use the default image
+                    )
+
+                    // Add the new event to the datasource
+                    Datasource.addEvent(newEvent)
+                } else {
+                    // Category is not selected, show error message or handle the scenario accordingly
+                    // For example, display a Snackbar to inform the user to select a category
+                }
+            }) {
                 Text(text = "Create", modifier = Modifier.padding(horizontal = 16.dp))
             }
         }
@@ -276,13 +344,12 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
 
 
 @Composable
-fun CategoryRow(fromEvent: Event? = null) {
-    var selectedCategory by remember { mutableStateOf(Datasource.categoryList[0]) }
+fun CategoryRow(
+    selectedCategory: EventCategory?,
+    onCategorySelected: (EventCategory) -> Unit,
+    fromEvent: Event? = null
+) {
     var expanded by remember { mutableStateOf(false) }
-
-    if(fromEvent != null) {
-        selectedCategory = Datasource.categoryList.find { it.categoryId == fromEvent.categoryId }!!
-    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -313,7 +380,7 @@ fun CategoryRow(fromEvent: Event? = null) {
             ) {
                 // Display selected category name
                 Text(
-                    text = stringResource(id = selectedCategory.categoryName),
+                    text = selectedCategory?.let { stringResource(id = it.categoryName) } ?: "Select Category",
                     style = MaterialTheme.typography.body1,
                     modifier = Modifier.weight(1f)
                 )
@@ -335,7 +402,7 @@ fun CategoryRow(fromEvent: Event? = null) {
         ) {
             Datasource.categoryList.forEach { category ->
                 DropdownMenuItem(onClick = {
-                    selectedCategory = category
+                    onCategorySelected(category)
                     expanded = false
                 }) {
                     Text(text = stringResource(id = category.categoryName))
@@ -344,6 +411,7 @@ fun CategoryRow(fromEvent: Event? = null) {
         }
     }
 }
+
 
 @Composable
 fun TextInputRow(
@@ -414,7 +482,7 @@ fun TextInputRow(
 fun PeopleInputRow(
     iconId: Int,
     hint: String,
-    onValueChange: (Int) -> Unit // Callback for integer value change
+    onNumberOfPeopleChange: (Int) -> Unit
 ) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -442,11 +510,11 @@ fun PeopleInputRow(
                 val newValue = it.text
                 text = it
                 val intValue = newValue.toIntOrNull()
-                if (intValue != null && intValue in 1..5) {
-                    onValueChange(intValue)
-                    errorMessage = null // Clear error message if input is valid
+                errorMessage = if (intValue != null && intValue in 1..5) {
+                    onNumberOfPeopleChange(intValue)
+                    null // Clear error message if input is valid
                 } else {
-                    errorMessage = "Please enter a number between 1 and 5"
+                    "Please enter a number between 1 and 5"
                 }
             },
             placeholder = { Text(text = hint) },
@@ -455,6 +523,7 @@ fun PeopleInputRow(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.weight(1f)
         )
+
     }
 
     // Display error message if present
@@ -470,6 +539,7 @@ fun PeopleInputRow(
         )
     }
 }
+
 
 
 @Composable
@@ -494,10 +564,79 @@ fun DateInputField(selectedDate: MutableState<Date>, modifier: Modifier = Modifi
 fun PriceInputRow(
     iconId: Int,
     hint: String,
+    numberOfPeople: Int, // Number of people input
     onValueChange: (Double) -> Unit // Callback for price value change
 ) {
-    // Implementation for input row specifically for prices
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var pricePerShare by remember { mutableDoubleStateOf(0.0) } // Initialize pricePerShare
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+    ) {
+        // Icon
+        Image(
+            painter = painterResource(id = iconId),
+            contentDescription = null,
+            modifier = Modifier.size(24.dp),
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Input box for price
+        var text by remember { mutableStateOf(TextFieldValue()) }
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = {
+                val newValue = it.text
+                text = it
+                val doubleValue = newValue.toDoubleOrNull()
+                if (doubleValue != null) {
+                    pricePerShare = ceil(doubleValue / numberOfPeople * 10) / 10 // Update pricePerShare based on the number of people
+                    onValueChange(doubleValue)
+                    errorMessage = null // Clear error message if input is valid
+                } else {
+                    errorMessage = "Please enter a valid price"
+                }
+            },
+            placeholder = { Text(text = hint) },
+            textStyle = MaterialTheme.typography.body1,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.weight(1f)
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Text field to display price per share
+        OutlinedTextField(
+            value = "($${String.format("%.1f", pricePerShare)} per share)",
+            onValueChange = {},
+            readOnly = true,
+            textStyle = MaterialTheme.typography.body1,
+            singleLine = true,
+            modifier = Modifier.weight(1f)
+        )
+    }
+
+    // Display error message if present
+    errorMessage?.let { message ->
+        Snackbar(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+            content = { Text(text = message) },
+            action = {
+                TextButton(onClick = { errorMessage = null }) {
+                    Text(text = "Dismiss")
+                }
+            }
+        )
+    }
 }
+
+
 @Preview
 @Composable
 fun NewEventScreenPreview() {
