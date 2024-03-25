@@ -7,27 +7,34 @@ import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.model.User
 import java.text.SimpleDateFormat
 
-import java.util.Date
-
-private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-
 object Datasource {
-    // Define a mutable list to hold the events
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+
     private val events = mutableListOf<Event>()
 
-    // Function to add a new event to the list
     fun addEvent(event: Event) {
         events.add(event)
     }
 
-    // Function to update the joined users list for a specific event
+    fun getUser(userId: Int): User {
+        return users.find { it.userId == userId } ?: throw NoSuchElementException("User with ID $userId not found")
+    }
+
+    fun updateUser(userId: Int, updatedUser: User) {
+        val index = users.indexOfFirst { it.userId == userId }
+        if (index != -1) {
+            users[index] = updatedUser
+        }
+    }
+
     fun updateEventList(updatedEvent: Event) {
         val index = events.indexOfFirst { it.eventId == updatedEvent.eventId }
         if (index != -1) {
             events[index] = updatedEvent
         }
     }
-    val users = listOf(
+
+    val users = mutableListOf(
         User(1, "Oliver", "Oliver Johnson", "oliver@mybvc.ca", "+1 403 123 4567"),
         User(2, "Emma", "Emma Thompson", "emma@mybvc.ca", "+1 403 765 4321"),
         User(3, "Sally", "Sally Thomas", "sally@mybvc.ca", "+1 403 765 4444"),
@@ -81,8 +88,8 @@ object Datasource {
         ),
         Event(
             3,
-            2,  // Category ID
-            "Whole Grain Bread (2 Loaves)",  // Title
+            2,
+            "Whole Grain Bread (2 Loaves)",
             "The Baker's Corner",
             3,
             dateFormat.parse("2024-03-10"),
@@ -96,7 +103,7 @@ object Datasource {
         ),
         Event(
             4,
-            2,  // Category ID (Same as above)
+            2,
             "Organic Flour (5kg Bag)",
             "The Miller's Mill",
             2,
@@ -111,7 +118,7 @@ object Datasource {
         ),
         Event(
             5,
-            3,  // Category ID (Same as above)
+            3,
             "Water Melon (10 Pcs)",
             "Herron Mews",
             2,
@@ -168,8 +175,6 @@ object Datasource {
             true,
             R.drawable.img_event_6,
             listOf(1,3)
-        ),
-
         )
+    )
 }
-
