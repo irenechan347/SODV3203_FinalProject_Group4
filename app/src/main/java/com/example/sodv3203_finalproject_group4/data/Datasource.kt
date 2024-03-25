@@ -21,8 +21,10 @@ object Datasource {
     }
 
     fun updateUser(userId: Int, updatedUser: User) {
+        // Find the index of the user with the given userId
         val index = users.indexOfFirst { it.userId == userId }
         if (index != -1) {
+            // Update the user data at the found index
             users[index] = updatedUser
         }
     }
@@ -34,7 +36,7 @@ object Datasource {
         }
     }
 
-    val users = mutableListOf(
+    var users = mutableListOf(
         User(1, "Oliver", "Oliver Johnson", "oliver@mybvc.ca", "+1 403 123 4567"),
         User(2, "Emma", "Emma Thompson", "emma@mybvc.ca", "+1 403 765 4321"),
         User(3, "Sally", "Sally Thomas", "sally@mybvc.ca", "+1 403 765 4444"),
@@ -55,7 +57,7 @@ object Datasource {
         3 to "Fruits",
     )
 
-    val eventList = listOf(
+    var eventList = listOf(
         Event(
             1,
             1,
