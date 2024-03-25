@@ -277,7 +277,7 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
         item {
             PeopleInputRow(
                 iconId = R.drawable.people,
-                hint = "Number of People (1-5)",
+                hint = "Number of People (2-4)",
                 onNumberOfPeopleChange = { newValue ->
                     numberOfPeople = newValue
                     // Recalculate price per share when the number of people changes
@@ -573,11 +573,11 @@ fun PeopleInputRow(
                 val newValue = it.text
                 text = it
                 val intValue = newValue.toIntOrNull()
-                errorMessage = if (intValue != null && intValue in 1..4) {
+                errorMessage = if (intValue != null && intValue in 2..4) {
                     onNumberOfPeopleChange(intValue)
                     null // Clear error message if input is valid
                 } else {
-                    "Please enter a number between 1 and 4"
+                    "Please enter a number between 2 and 4"
                 }
             },
             placeholder = { Text(text = hint) },
