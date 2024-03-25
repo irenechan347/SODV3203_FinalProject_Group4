@@ -1,0 +1,30 @@
+[
+  {
+    "userId": 1,
+    "displayName": "Oliver",
+    "name": "Oliver Johnson",
+    "email": "oliver@mybvc.ca",
+    "phoneNo": "+1 403 123 4567"
+  },
+  {
+    "userId": 2,
+    "displayName": "Emma",
+    "name": "Emma Thompson",
+    "email": "emma@mybvc.ca",
+    "phoneNo": "+1 403 765 4321"
+  },
+  {
+    "userId": 3,
+    "displayName": "Sally",
+    "name": "Sally Thomas",
+    "email": "sally@mybvc.ca",
+    "phoneNo": "+1 403 765 4444"
+  },
+  {
+    "userId": 4,
+    "displayName": "John",
+    "name": "John Owen",
+    "email": "john@mybvc.ca",
+    "phoneNo": "+1 403 765 3333"
+  }
+]

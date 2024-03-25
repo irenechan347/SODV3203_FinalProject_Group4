@@ -71,6 +71,7 @@ dependencies {
     implementation("androidx.compose.animation:animation:1.0.5")
     implementation("androidx.compose.ui:ui:$compose_version")
     implementation("androidx.compose.foundation:foundation:$compose_version")
+    implementation("com.google.code.gson:gson:2.8.8")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

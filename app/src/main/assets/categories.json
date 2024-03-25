@@ -1,0 +1,14 @@
+[
+  {
+    "categoryId": 1,
+    "categoryName": "Batteries"
+  },
+  {
+    "categoryId": 2,
+    "categoryName": "Bakery"
+  },
+  {
+    "categoryId": 3,
+    "categoryName": "Fruits"
+  }
+]

@@ -40,14 +40,18 @@ object Datasource {
         User(1, "Oliver", "Oliver Johnson", "oliver@mybvc.ca", "+1 403 123 4567"),
         User(2, "Emma", "Emma Thompson", "emma@mybvc.ca", "+1 403 765 4321"),
         User(3, "Sally", "Sally Thomas", "sally@mybvc.ca", "+1 403 765 4444"),
-        User(4, "John", "John Owen", "john@mybvc.ca", "+1 403 765 3333"),
-        // Add more User objects as needed
+        User(4, "John", "John Owen", "john@mybvc.ca", "+1 403 765 3333")
     )
 
     val categoryList = listOf(
+        EventCategory(1, "Batteries"),
+        EventCategory(2, "Bakery"),
+        EventCategory(3, "Fruits")
+        /*
         EventCategory(1, R.string.cat_batteries),
         EventCategory(2, R.string.cat_bakery),
         EventCategory(3, R.string.cat_fruits),
+        */
         //EventCategory(4, R.string.cat_others)
     )
 
@@ -70,7 +74,8 @@ object Datasource {
             "Oliver",
             EventStatus.Available,
             false,
-            R.drawable.img_event_1,
+            "img_event_1",
+            //R.drawable.img_event_1,
             listOf(1,2)
         ),
         Event(
@@ -85,7 +90,8 @@ object Datasource {
             "Sally",
             EventStatus.Joined,
             true,
-            R.drawable.img_event_2,
+            "img_event_2",
+            //R.drawable.img_event_2,
             listOf(1,2,3,4)
         ),
         Event(
@@ -100,7 +106,8 @@ object Datasource {
             "Sally",
             EventStatus.Paid,
             false,
-            R.drawable.img_event_8,
+            "img_event_8",
+            //R.drawable.img_event_8,
             listOf(1,2,4)
         ),
         Event(
@@ -115,7 +122,8 @@ object Datasource {
             "Emma",
             EventStatus.Completed,
             true,
-            R.drawable.img_event_9,
+            "img_event_9",
+            //R.drawable.img_event_9,
             listOf(3,4)
         ),
         Event(
@@ -130,7 +138,8 @@ object Datasource {
             "John",
             EventStatus.Cancelled,
             false,
-            R.drawable.img_event_4,
+            "img_event_4",
+            //R.drawable.img_event_4,
             listOf(4)
         ),
         Event(
@@ -145,7 +154,8 @@ object Datasource {
             "Emma",
             EventStatus.Available,
             false,
-            R.drawable.img_event_5,
+            "img_event_5",
+            //R.drawable.img_event_5,
             listOf(2,3)
         ),
         Event(
@@ -160,7 +170,8 @@ object Datasource {
             "John",
             EventStatus.Cancelled,
             true,
-            R.drawable.img_event_6,
+            "img_event_6",
+            //R.drawable.img_event_6,
             listOf(2,4)
         ),
         Event(
@@ -175,7 +186,8 @@ object Datasource {
             "Sally",
             EventStatus.Available,
             true,
-            R.drawable.img_event_6,
+            "img_event_6",
+            //R.drawable.img_event_6,
             listOf(1,3)
         ),
         Event(
@@ -190,7 +202,8 @@ object Datasource {
             "Sally",
             EventStatus.Available,
             true,
-            R.drawable.img_event_3,
+            "img_event_3",
+            //R.drawable.img_event_3,
             listOf(3)
         ),
         Event(
@@ -205,7 +218,8 @@ object Datasource {
             "John",
             EventStatus.Joined,
             true,
-            R.drawable.img_event_9,
+            "img_event_9",
+            //R.drawable.img_event_9,
             listOf(1,3,4)
         ),
     )

@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.sodv3203_finalproject_group4.LoadImage
 import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
@@ -165,7 +166,7 @@ fun EventItem(event: Event, navController: NavHostController, userId: Int) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = event.imageId),
+                painter = LoadImage(event.imageName),
                 contentDescription = "${event.productName} image",
                 modifier = Modifier
                     .size(64.dp)

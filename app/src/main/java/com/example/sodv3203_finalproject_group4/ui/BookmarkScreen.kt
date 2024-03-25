@@ -1,5 +1,6 @@
 package com.example.sodv3203_finalproject_group4.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,14 +36,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.sodv3203_finalproject_group4.LoadImage
 import com.example.sodv3203_finalproject_group4.ShoppingBuddyScreen
+import com.example.sodv3203_finalproject_group4.categoryMap
 import com.example.sodv3203_finalproject_group4.data.Datasource
+import com.example.sodv3203_finalproject_group4.data.EventDataSource
+import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
@@ -50,7 +56,8 @@ import kotlin.math.ceil
 
 @Composable
 fun BookmarkScreen(navController: NavHostController, userId:Int) {
-    val bookmarkedEventList = Datasource.eventList.filter { it.isBookmark }
+    //val bookmarkedEventList = Datasource.eventList.filter { it.isBookmark }
+    val bookmarkedEventList = events.filter { it.isBookmark }
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -78,8 +85,10 @@ fun BookmarkList(eventList: List<Event>, navController: NavHostController, userI
 
 @Composable
 fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int) {
-    val categoryName = Datasource.categoryMap[event.categoryId]
-    var isBookmarked by remember { mutableStateOf(event.isBookmark) }
+    //val categoryName = Datasource.categoryMap[event.categoryId]
+    val categoryName = categoryMap[event.categoryId]
+    //var isBookmarked by remember { mutableStateOf(event.isBookmark) }
+    val context = LocalContext.current
 
     Row(
         modifier = Modifier
@@ -88,7 +97,7 @@ fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int)
     ) {
         Column {
             Image(
-                painter = painterResource(id = event.imageId),
+                painter = LoadImage(event.imageName),
                 contentDescription = null,
                 modifier = Modifier
                     .width(130.dp)
@@ -120,10 +129,18 @@ fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int)
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
-                    onClick = { isBookmarked = !isBookmarked }
+                    onClick = {
+                        //isBookmarked = !isBookmarked
+                        Log.d("Events", events.toString())
+                        event.isBookmark = !event.isBookmark
+                        Log.d("Events", events.toString())
+                        EventDataSource.saveEvents(context, events)
+                        //val loadedEvents = EventDataSource.loadEvents(context)
+                        //Log.d("Loaded Events", loadedEvents.toString())
+                    }
                 ) {
                     Icon(
-                        imageVector = if (isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        imageVector = if (event.isBookmark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "Bookmark",
                         tint = Color(0xFFFF4500)
                     )

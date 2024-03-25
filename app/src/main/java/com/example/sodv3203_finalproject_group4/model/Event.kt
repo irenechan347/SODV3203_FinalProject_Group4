@@ -12,17 +12,18 @@ enum class EventStatus() {
 }
 
 data class Event(
-    val eventId: Int,
-    val categoryId: Int,
-    val productName: String,
-    val location: String,
-    val currHeadCount: Int,
-    val dateFrom: Date,
-    val dateTo: Date,
-    val price: Double,
-    val eventBy: String,
-    val status: EventStatus,
-    val isBookmark: Boolean,
-    @DrawableRes val imageId: Int,
-    val joinedUsers: List<Int> = emptyList()
+    var eventId: Int,
+    var categoryId: Int,
+    var productName: String,
+    var location: String,
+    var currHeadCount: Int,
+    var dateFrom: Date,
+    var dateTo: Date,
+    var price: Double,
+    var eventBy: String,
+    var status: EventStatus,
+    var isBookmark: Boolean,
+    //@DrawableRes var imageId: Int,
+    var imageName: String,
+    var joinedUsers: List<Int> = emptyList()
 )

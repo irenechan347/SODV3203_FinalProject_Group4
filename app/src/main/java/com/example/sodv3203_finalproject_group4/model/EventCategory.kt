@@ -4,5 +4,6 @@ import androidx.annotation.StringRes
 
 data class EventCategory(
     val categoryId: Int,
-    @StringRes val categoryName: Int
+    //@StringRes val categoryName: Int
+    val categoryName: String
 )

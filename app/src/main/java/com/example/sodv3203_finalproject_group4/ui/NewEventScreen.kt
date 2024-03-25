@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sodv3203_finalproject_group4.R
@@ -48,6 +47,7 @@ import kotlin.math.ceil
 import android.util.Log
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.sodv3203_finalproject_group4.LoadImage
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -141,7 +141,7 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
                     contentAlignment = Alignment.Center
                 ) {
                     // Check if fromEvent is not null and if there's a selected image URI
-                    val defaultImageId = fromEvent?.imageId
+                    val defaultImageId = fromEvent?.imageName
 
                     // Display the selected image or the upload icon
                     if (isPhotoUploaded || defaultImageId != null) {
@@ -155,7 +155,8 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
                             )
                         } else {
                             // Display the default image based on imageId
-                            painterResource(id = defaultImageId!!)
+                            //painterResource(id = defaultImageId!!)
+                            LoadImage(defaultImageId!!)
                         }
                         Image(
                             painter = painter,
@@ -481,7 +482,8 @@ fun CategoryRow(
                     onCategorySelected(category)
                     expanded = false
                 }) {
-                    Text(text = stringResource(id = category.categoryName))
+                    //Text(text = stringResource(id = category.categoryName))
+                    Text(text = category.categoryName)
                 }
             }
         }
@@ -762,8 +764,8 @@ fun CreateButton(
                 eventBy = userId.toString(),
                 status = EventStatus.Available, // Default status
                 isBookmark = false, // Default value
-                imageId = fromEvent?.imageId
-                    ?: R.drawable.img_event_1 // Use the imageId from fromEvent if available, otherwise use the default image
+                imageName = fromEvent?.imageName
+                    ?: "img_event_1" // Use the imageId from fromEvent if available, otherwise use the default image
             )
 
             // Add the new event to the datasource

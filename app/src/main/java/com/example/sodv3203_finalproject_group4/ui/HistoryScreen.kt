@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,24 +22,22 @@ import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.sodv3203_finalproject_group4.LoadImage
 import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.data.Datasource.eventList
+import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
@@ -48,7 +45,8 @@ import kotlin.math.ceil
 
 @Composable
 fun HistoryScreen(navController: NavHostController, userId:Int) {
-    val filteredEventList = eventList.filter { it.status != EventStatus.Available  && it.joinedUsers.contains(userId) }
+    //val filteredEventList = eventList.filter { it.status != EventStatus.Available  && it.joinedUsers.contains(userId) }
+    val filteredEventList = events.filter { it.status != EventStatus.Available  && it.joinedUsers.contains(userId) }
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -89,7 +87,7 @@ fun HistoryListItem(event: Event, navController: NavHostController, userId:Int) 
     ) {
         Column {
             Image(
-                painter = painterResource(id = event.imageId),
+                painter = LoadImage(event.imageName),
                 contentDescription = null,
                 modifier = Modifier
                     .width(130.dp)

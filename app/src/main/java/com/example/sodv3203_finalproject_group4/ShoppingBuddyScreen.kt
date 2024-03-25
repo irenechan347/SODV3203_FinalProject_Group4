@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
@@ -42,7 +43,9 @@ import com.example.sodv3203_finalproject_group4.ui.EventViewModel
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import com.example.sodv3203_finalproject_group4.ui.BookmarkScreen
 import com.example.sodv3203_finalproject_group4.ui.HistoryScreen
 import com.example.sodv3203_finalproject_group4.ui.HomeScreen
@@ -283,6 +286,16 @@ fun ShoppingBuddyApp(
 
         }
     }
+}
+
+@Composable
+fun LoadImage(imageName: String?, modifier: Modifier = Modifier, contentDescription: String? = null) : Painter {
+    if (imageName != null) {
+        val context = LocalContext.current
+        val resourceId = context.resources.getIdentifier(imageName, "drawable", context.packageName)
+        return painterResource(id = resourceId)
+    }
+    return painterResource(R.drawable.placeholder_image)
 }
 
 @Preview(showBackground = true)

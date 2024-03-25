@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.sodv3203_finalproject_group4.LoadImage
 import com.example.sodv3203_finalproject_group4.R
 import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
@@ -64,7 +65,7 @@ fun EventScreen(userId: Int, eventId: Int) {
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(id = event.imageId),
+                        painter = LoadImage(event.imageName),
                         contentDescription = "Event Image",
                         modifier = Modifier
                             .size(140.dp)
