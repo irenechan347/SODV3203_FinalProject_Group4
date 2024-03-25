@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.SODV3203_FinalProject_Group4" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Light Theme -->
+    <style name="AppTheme.Light" parent="Theme.MaterialComponents.Light">
+        <!-- Define your light theme attributes here -->
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <!-- Dark Theme -->
+    <style name="AppTheme.Dark" parent="Theme.MaterialComponents">
+        <!-- Define your dark theme attributes here -->
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:textColor">@color/white</item> <!-- Text color set to white -->
+    </style>
+
+    <!-- Your main app theme -->
+    <style name="Theme.SODV3203_FinalProject_Group4" parent="AppTheme.Light">
+        <!-- Define your main app theme attributes here -->
+        <!-- You can customize your main theme here -->
+    </style>
 </resources>

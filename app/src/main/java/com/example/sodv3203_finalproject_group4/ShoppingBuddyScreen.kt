@@ -114,7 +114,7 @@ fun MyBottomNavigationBar(
 ) {
     BottomNavigation(
         modifier = Modifier.fillMaxWidth(),
-        backgroundColor = Color.White,
+        backgroundColor = MaterialTheme.colorScheme.surface,
         elevation = 8.dp
     ) {
         BottomNavigationItem(
