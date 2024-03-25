@@ -247,14 +247,14 @@ fun ShoppingBuddyApp(
                 NewEventScreen()
             }*/
             composable(route = "NewEvent/{userId}"){backStackEntry ->
-                backStackEntry.arguments?.getString("userId")?.toIntOrNull()?.let { userId -> NewEventScreen(userId = userId) }
+                backStackEntry.arguments?.getString("userId")?.toIntOrNull()?.let { userId -> NewEventScreen(navController = navController, userId = userId) }
 
             }
 
             composable(route = "NewEvent/{userId}/{eventId}"){backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
                 val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: throw IllegalArgumentException("Event ID not found")
-                NewEventScreen(userId = userId, eventId = eventId)
+                NewEventScreen(userId = userId, navController = navController, eventId = eventId)
             }
 
             /*composable(route = ShoppingBuddyScreen.Event.name) {

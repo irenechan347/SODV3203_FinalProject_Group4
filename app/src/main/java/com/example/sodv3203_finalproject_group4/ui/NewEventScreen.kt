@@ -46,10 +46,12 @@ import com.example.sodv3203_finalproject_group4.model.EventStatus
 import java.text.SimpleDateFormat
 import kotlin.math.ceil
 import android.util.Log
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun NewEventScreen(userId: Int, eventId: Int = -1) {
+fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int = -1) {
 
     // Find the maximum event ID from the existing event list
     val maxEventId = Datasource.eventList.maxOfOrNull { it.eventId } ?: 0
@@ -363,27 +365,40 @@ fun NewEventScreen(userId: Int, eventId: Int = -1) {
             )
             // Show dialog if showDialog is true
             if (showDialog) {
-                ShowDataSentDialog(onDismiss = { showDialog = false })
+                ShowDataSentDialog(
+                    navController = navController,
+                    userId = userId,
+                    onDismiss = {
+                        showDialog = false
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun ShowDataSentDialog(onDismiss: () -> Unit) {
+fun ShowDataSentDialog(navController: NavHostController, userId: Int, onDismiss: () -> Unit) {
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            onDismiss()
+            navController.navigate("HomeScreen/$userId")
+        },
         title = { Text("Data Sent") },
         text = { Text("The data has been successfully sent to the database.") },
         confirmButton = {
             Button(
-                onClick = onDismiss
+                onClick = {
+                    onDismiss()
+                    navController.navigate("home/$userId")
+                }
             ) {
                 Text("OK")
             }
         }
     )
 }
+
 
 @Composable
 fun MissingFieldsDialog(onDismiss: () -> Unit) {
@@ -776,8 +791,9 @@ fun CreateButton(
 @Preview
 @Composable
 fun NewEventScreenPreview() {
+    val navController = rememberNavController()
     ShoppingBuddyAppTheme {
-        NewEventScreen(userId = 2, eventId = -1)
+        NewEventScreen(navController = navController, userId = 2, eventId = -1)
     }
 }
 
