@@ -47,7 +47,7 @@ import kotlin.math.ceil
 
 @Composable
 fun HistoryScreen(navController: NavHostController, userId:Int) {
-    val filteredEventList = eventList.filter { it.status != EventStatus.Available }
+    val filteredEventList = eventList.filter { it.status != EventStatus.Available  && it.joinedUsers.contains(userId) }
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
