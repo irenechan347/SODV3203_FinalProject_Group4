@@ -47,10 +47,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
+import androidx.compose.material.Checkbox
+import com.example.sodv3203_finalproject_group4.model.EventStatus
 
 @Composable
 fun HomeScreen(navController: NavHostController, userId:Int) {
     var searchText by remember { mutableStateOf("") }
+    var showAvailableEvents by remember { mutableStateOf(false) }
     val user = remember {
         Datasource.users.find { it.userId == userId }
     }
@@ -108,12 +111,35 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
                     )
                 }
             )
+            Spacer(modifier = Modifier.width(16.dp))
+            // Checkbox for filtering available events
+            Checkbox(
+                checked = showAvailableEvents,
+                onCheckedChange = { isChecked ->
+                    showAvailableEvents = isChecked
+                },
+                modifier = Modifier.padding(end = 16.dp)
+            )
+            Text(
+                text = "",
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier.clickable { showAvailableEvents = !showAvailableEvents }
+            )
         }
 
-        val filteredEvents = Datasource.eventList.filter {
-            it.productName.contains(searchText, ignoreCase = true)
+        // Filtered events based on product name search and availability
+        val filteredEvents = if (showAvailableEvents) {
+            Datasource.eventList.filter {
+                it.status == EventStatus.Available &&
+                        it.productName.contains(searchText, ignoreCase = true)
+            }
+        } else {
+            Datasource.eventList.filter {
+                it.productName.contains(searchText, ignoreCase = true)
+            }
         }
 
+        // Display filtered events
         LazyColumn(modifier = Modifier.padding(8.dp)) {
             items(filteredEvents) { event ->
                 EventItem(event = event, navController, userId)
