@@ -48,7 +48,8 @@ fun ProfileScreen(navController: NavController, userId:Int) {
             Text(
                 text = user.displayName,
                 style = MaterialTheme.typography.h5,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = MaterialTheme.colors.background
             )
 
             // Group 4 and Email (Centered)
@@ -60,7 +61,8 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                 // Email
                 Text(
                     text = user.email,
-                    style = MaterialTheme.typography.body1
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.colors.background
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -68,7 +70,8 @@ fun ProfileScreen(navController: NavController, userId:Int) {
             // Divider line
             Divider(
                 thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                color = MaterialTheme.colors.background
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -80,12 +83,13 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                 Icon(
                     painter = painterResource(id = R.drawable.profileicon),
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Edit Profile",
                     style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.background
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
