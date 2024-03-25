@@ -3,6 +3,7 @@ package com.example.sodv3203_finalproject_group4.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,14 +28,23 @@ import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.material.AlertDialog
+import com.example.sodv3203_finalproject_group4.model.EventStatus
+
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun EventScreen(userId: Int, eventId: Int) {
     val event = remember { Datasource.eventList.firstOrNull { it.eventId == eventId } }
+    val user = remember { Datasource.users.firstOrNull { it.userId == userId } }
+    var showDialog by remember { mutableStateOf(false) }
 
     if (event != null) {
-        val joinedUsers = event.joinedUsers.mapNotNull { userId -> Datasource.users.firstOrNull { it.userId == userId } }
+        val joinedUsers =
+            event.joinedUsers.mapNotNull { userId -> Datasource.users.firstOrNull { it.userId == userId } }
         val isUserJoined = event.joinedUsers.contains(userId)
 
         // Define updatedEvent based on whether the user is already joined or not
@@ -49,7 +59,8 @@ fun EventScreen(userId: Int, eventId: Int) {
                 Box(
                     modifier = Modifier
                         .size(140.dp)
-                        .padding(bottom = 8.dp),
+                        .padding(bottom = 8.dp)
+                        .clickable(enabled = false) { },
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -62,28 +73,46 @@ fun EventScreen(userId: Int, eventId: Int) {
                 }
             }
             item {
-                CategoryRow(
-                    selectedCategory = Datasource.categoryList.find { it.categoryId == event.categoryId },
-                    onCategorySelected = { /* Not applicable for EventScreen */ },
-                    fromEvent = event,
-                    selectedCategoryId = event.categoryId,
-                    categoryMap = Datasource.categoryMap
-                )
+                Box(
+                    modifier = Modifier
+                        .clickable(enabled = false) { },
+                ) {
+                    CategoryRow(
+                        selectedCategory = Datasource.categoryList.find { it.categoryId == event.categoryId },
+                        onCategorySelected = { /* Not applicable for EventScreen */ },
+                        fromEvent = event,
+                        selectedCategoryId = event.categoryId,
+                        categoryMap = Datasource.categoryMap
+                    )
+                }
             }
+
             item {
-                TextInputRow(
-                    iconId = R.drawable.product,
-                    hint = "Product Description",
-                    initialText = event.productName ?: ""
-                ) { /* Not applicable for EventScreen */ }
+                Box(
+                    modifier = Modifier
+                        .clickable(enabled = false) { },
+                ) {
+                    TextInputRow(
+                        iconId = R.drawable.product,
+                        hint = "Product Description",
+                        initialText = event.productName ?: ""
+                    ) { /* Not applicable for EventScreen */ }
+                }
             }
+
             item {
-                TextInputRow(
-                    iconId = R.drawable.location,
-                    hint = "Location",
-                    initialText = event.location ?: ""
-                ) { /* Not applicable for EventScreen */ }
+                Box(
+                    modifier = Modifier
+                        .clickable(enabled = false) { },
+                ) {
+                    TextInputRow(
+                        iconId = R.drawable.location,
+                        hint = "Location",
+                        initialText = event.location ?: ""
+                    ) { /* Not applicable for EventScreen */ }
+                }
             }
+
             item {
                 Text(
                     text = "Number of People: ${event.currHeadCount}",
@@ -103,13 +132,21 @@ fun EventScreen(userId: Int, eventId: Int) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "From: ${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(event.dateFrom)}",
+                        text = "From: ${
+                            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
+                                event.dateFrom
+                            )
+                        }",
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "to: ${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(event.dateTo)}",
+                        text = "To: ${
+                            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
+                                event.dateTo
+                            )
+                        }",
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier.weight(1f)
                     )
@@ -117,7 +154,12 @@ fun EventScreen(userId: Int, eventId: Int) {
             }
             item {
                 Text(
-                    text = "Price per share: $${String.format("%.1f", event.price / event.currHeadCount)}",
+                    text = "Price per share: $${
+                        String.format(
+                            "%.1f",
+                            event.price / event.currHeadCount
+                        )
+                    }",
                     style = MaterialTheme.typography.body1,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -134,18 +176,28 @@ fun EventScreen(userId: Int, eventId: Int) {
             joinedUsers.forEach { user ->
                 item {
                     Text(
-                        text = "- ${user.displayName}",
+                        text = "- ${user.displayName}    ${user.phoneNo}",
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier.padding(start = 16.dp)
                     )
                 }
             }
 
+            // Display event status
+            item {
+                Text(
+                    text = "Status: ${event.status}",
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
             // Join button
-            if (!isUserJoined && joinedUsers.size < event.currHeadCount) {
+            if (event.status == EventStatus.Available && !isUserJoined && joinedUsers.size < event.currHeadCount) {
                 item {
                     Button(
                         onClick = {
+                            showDialog = true
                             val updatedEventList = Datasource.eventList.map {
                                 if (it.eventId == eventId) {
                                     it.copy(joinedUsers = it.joinedUsers + userId)
@@ -163,16 +215,28 @@ fun EventScreen(userId: Int, eventId: Int) {
                 }
             }
         }
-    } else {
-        Text(text = "Event not found", modifier = Modifier.padding(16.dp))
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text(text = "Success") },
+                text = { Text(text = "The event is joined.") },
+                confirmButton = {
+                    Button(
+                        onClick = { showDialog = false },
+                    ) {
+                        Text(text = "OK")
+                    }
+                }
+            )
+        }
     }
 }
-
 
 @Preview
 @Composable
 fun EventScreenPreview() {
     ShoppingBuddyAppTheme {
-        EventScreen(2, 2,)
+        EventScreen(2, 4,)
     }
 }
