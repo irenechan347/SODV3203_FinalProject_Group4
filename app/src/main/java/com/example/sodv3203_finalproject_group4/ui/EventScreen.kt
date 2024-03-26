@@ -38,7 +38,7 @@ import com.example.sodv3203_finalproject_group4.data.EventDataSource
 import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.users
-
+import androidx.compose.ui.text.font.FontWeight
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -180,9 +180,10 @@ fun EventScreen(userId: Int, eventId: Int) {
             }
             joinedUsers.forEach { user ->
                 item {
+                    val fontWeight = if (user.userId == userId) FontWeight.Bold else FontWeight.Normal
                     Text(
                         text = "- ${user.displayName}    ${user.phoneNo}",
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.body1.copy(fontWeight = fontWeight),
                         modifier = Modifier.padding(start = 16.dp)
                     )
                 }

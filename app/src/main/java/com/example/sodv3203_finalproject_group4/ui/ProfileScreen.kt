@@ -26,7 +26,7 @@ import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 @Composable
 fun ProfileScreen(navController: NavController, userId:Int) {
     var users = users.toMutableList()
-    val user = users.find { it.userId == userId } ?: User(-1, "", "", "", "") // Default user if not found
+    val user = users.find { it.userId == userId } ?: User(-1, "", "", "", "", "") // Default user if not found
     //var user = Datasource.getUser(userId)
     var displayName by remember { mutableStateOf(user.displayName) }
     var name by remember { mutableStateOf(user.name) }

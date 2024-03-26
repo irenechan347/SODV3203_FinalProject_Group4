@@ -51,6 +51,7 @@ import com.example.sodv3203_finalproject_group4.categories
 import com.example.sodv3203_finalproject_group4.categoryMap
 import com.example.sodv3203_finalproject_group4.data.EventDataSource
 import com.example.sodv3203_finalproject_group4.events
+import androidx.compose.ui.text.TextStyle
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -335,6 +336,7 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
                 // Second date input field
                 DateInputField(
                     selectedDate = mutableStateOf(secondSelectedDate),
+                    style = MaterialTheme.typography.body1,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -626,7 +628,11 @@ fun PeopleInputRow(
 
 
 @Composable
-fun DateInputField(selectedDate: MutableState<Date>, modifier: Modifier = Modifier) {
+fun DateInputField(
+    selectedDate: MutableState<Date>,
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.body1 // Use style instead of TextStyle
+) {
     val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
 
     OutlinedTextField(
@@ -637,10 +643,12 @@ fun DateInputField(selectedDate: MutableState<Date>, modifier: Modifier = Modifi
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number
         ),
+        textStyle = style, // Apply the provided style
         modifier = modifier
     )
-
 }
+
+
 
 
 @Composable
