@@ -51,6 +51,7 @@ import com.example.sodv3203_finalproject_group4.ui.NewEventScreen
 import com.example.sodv3203_finalproject_group4.ui.EventScreen
 import com.example.sodv3203_finalproject_group4.ui.ProfileScreen
 import com.example.sodv3203_finalproject_group4.ui.SignInScreen
+import com.example.sodv3203_finalproject_group4.ui.SignUpScreen
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 
 enum class ShoppingBuddyScreen(@StringRes val title: Int) {
@@ -238,6 +239,10 @@ fun ShoppingBuddyApp(
                 // val context = LocalContext.current
                 HomeScreen(navController = navController)
             }*/
+
+            composable("signUp") {
+                SignUpScreen(navController = navController)
+            }
             composable(route = "home/{userId}") { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")
                 userId?.let {

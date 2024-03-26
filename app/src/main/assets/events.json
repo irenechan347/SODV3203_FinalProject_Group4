@@ -13,7 +13,7 @@
     "status": "Available",
     "isBookmark": false,
     "imageName": "img_event_1",
-    "joinedUsers": [1, 2, 3]
+    "joinedUsers": [1, 2]
   },
   {
     "eventId": 2,

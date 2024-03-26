@@ -58,6 +58,16 @@ fun SignInScreen(navController: NavHostController) {
             Text("Sign In")
         }
 
+        // Button to navigate to SignUp page
+        Button(
+            onClick = {
+                navController.navigate("signUp")
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("Sign Up")
+        }
+        
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },

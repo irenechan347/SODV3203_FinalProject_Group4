@@ -21,6 +21,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import com.example.sodv3203_finalproject_group4.users
 
 @Composable
 fun SignUpScreen(navController: NavController) {
@@ -89,8 +90,9 @@ fun SignUpScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
+                    val largestUserId = users.maxOfOrNull { it.userId } ?: 0
                     val newUser = User(
-                        userId = 0, // Assign a temporary ID
+                        userId = largestUserId + 1,
                         displayName = displayName,
                         name = name,
                         email = email,
@@ -105,6 +107,16 @@ fun SignUpScreen(navController: NavController) {
                 Text("Submit")
             }
 
+            Button(
+                onClick = {
+                    navController.popBackStack("signIn", inclusive = true)
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text("Cancel")
+            }
+
+            val userToShow = users.find { it.email == email }
             if (showDialog) {
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
@@ -112,13 +124,17 @@ fun SignUpScreen(navController: NavController) {
                     text = { Text(text = "Your profile has been created.") },
                     confirmButton = {
                         Button(
-                            onClick = { navController.navigate("home") },
+                            onClick = {
+                                // Navigate to the home screen with the user's ID
+                                userToShow?.let { navController.navigate("home/${it.userId}") }
+                            }
                         ) {
                             Text(text = "OK")
                         }
                     }
                 )
             }
+
         }
     }
 }
