@@ -1,6 +1,7 @@
 package com.example.sodv3203_finalproject_group4.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -17,7 +18,9 @@ import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 @Composable
 fun SignInScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") } // Not used for authentication in this example
+    var password by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.padding(16.dp)) {
         OutlinedTextField(
@@ -38,13 +41,36 @@ fun SignInScreen(navController: NavHostController) {
             onClick = {
                 val user = users.find { it.email == email }
                 user?.let {
-                    UserSessionManager.login(it.userId) // Store userId in session manager
-                    navController.navigate("home/${it.userId}")
+                    if (it.password == password) {
+                        UserSessionManager.login(it.userId)
+                        navController.navigate("home/${it.userId}")
+                    } else {
+                        showDialog = true
+                        dialogMessage = "User Email or Password is wrong"
+                    }
+                } ?: run {
+                    showDialog = true
+                    dialogMessage = "User not found"
                 }
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("Sign In")
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Error") },
+                text = { Text(dialogMessage) },
+                confirmButton = {
+                    Button(
+                        onClick = { showDialog = false }
+                    ) {
+                        Text("OK")
+                    }
+                }
+            )
         }
     }
 }
