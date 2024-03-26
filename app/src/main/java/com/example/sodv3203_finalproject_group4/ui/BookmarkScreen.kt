@@ -22,6 +22,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -75,7 +76,11 @@ fun BookmarkList(eventList: List<Event>, navController: NavHostController, userI
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
             ) {
-                Divider(color = Color(0xFFFF4500), thickness = 1.dp)
+                Divider(
+                    //color = Color(0xFFFF4500),
+                    color = MaterialTheme.colors.secondaryVariant,
+                    thickness = 1.dp
+                )
             }
         }
     }
@@ -139,7 +144,8 @@ fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int)
                     Icon(
                         imageVector = if (isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "Bookmark",
-                        tint = Color(0xFFFF4500)
+                        tint = MaterialTheme.colors.secondaryVariant
+                        //tint = Color(0xFFFF4500)
                     )
                 }
             }
@@ -167,25 +173,25 @@ fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int)
 private fun ButtonColors(status: EventStatus): ButtonColors {
     return when (status) {
         EventStatus.Available -> ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFFFFF4F0),
-            contentColor = Color(0xFFFF4500),
+            backgroundColor = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.secondaryVariant,
             disabledBackgroundColor = Color.Transparent,
-            disabledContentColor = Color(0xFFFF4500)
+            disabledContentColor = MaterialTheme.colors.secondaryVariant
         )
         EventStatus.Joined -> ButtonDefaults.buttonColors(
             backgroundColor = Color.White,
-            contentColor = Color(0xFFFF4500),
+            contentColor = MaterialTheme.colors.secondaryVariant,
             disabledBackgroundColor = Color.Transparent,
-            disabledContentColor = Color(0xFFFF4500)
+            disabledContentColor = MaterialTheme.colors.secondaryVariant
         )
         EventStatus.Paid -> ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFFFFF4F0),
-            contentColor = Color(0xFFFF4500),
+            backgroundColor = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.secondaryVariant,
             disabledBackgroundColor = Color.Transparent,
-            disabledContentColor = Color(0xFFFF4500)
+            disabledContentColor = MaterialTheme.colors.secondaryVariant
         )
         EventStatus.Completed -> ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFFFF4500),
+            backgroundColor = MaterialTheme.colors.secondaryVariant,
             contentColor = Color.White,
             disabledBackgroundColor = Color.Transparent,
             disabledContentColor = Color.White

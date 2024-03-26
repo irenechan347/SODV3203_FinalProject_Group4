@@ -47,6 +47,7 @@ import com.example.sodv3203_finalproject_group4.LoadImage
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import androidx.compose.material.Checkbox
+import androidx.compose.material.primarySurface
 import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.users
@@ -205,7 +206,8 @@ fun EventItem(event: Event, navController: NavHostController, userId: Int) {
                 Icon(
                     imageVector = if (isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "Bookmark",
-                    tint = Color(0xFFFF4500)
+                    tint = MaterialTheme.colors.secondaryVariant
+                    //tint = Color(0xFFFF4500)
                 )
             }
         }
