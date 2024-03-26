@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,6 +49,9 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
     val event = remember { events.firstOrNull { it.eventId == eventId } }
     val user = remember { users.firstOrNull { it.userId == userId } }
     var showDialog by remember { mutableStateOf(false) }
+    val eventStatus = remember { mutableStateOf(EventStatus.Available) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedStatus by remember { mutableStateOf(EventStatus.Available) }
 
     if (event != null) {
         val joinedUsers =
@@ -61,12 +65,13 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
             event // No need to update if user is already joined
         }
 
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(10.dp)) {
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)) {
             item {
                 Box(
                     modifier = Modifier
                         .size(140.dp)
-                        .padding(bottom = 8.dp)
                         .clickable(enabled = false) { },
                     contentAlignment = Alignment.Center
                 ) {
@@ -75,10 +80,19 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                         contentDescription = "Event Image",
                         modifier = Modifier
                             .size(140.dp)
-                            .padding(bottom = 8.dp)
                     )
                 }
             }
+
+            // Display event by information
+            item {
+                Text(
+                    text = "Event by: ${(users.find { it.userId == event.eventBy.toInt() })?.displayName}",
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
             item {
                 Box(
                     modifier = Modifier
@@ -120,6 +134,7 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                 }
             }
 
+            // Display NO. of People
             item {
                 Text(
                     text = "Number of People: ${event.currHeadCount}",
@@ -127,10 +142,22 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
+
+            // Display price
+            item {
+                Text(
+                    text = "$${event.price} (${String.format("%.1f", event.price / event.currHeadCount)} per share)",
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
+
             item {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.calendar),
@@ -159,18 +186,6 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                     )
                 }
             }
-            item {
-                Text(
-                    text = "Price per share: $${
-                        String.format(
-                            "%.1f",
-                            event.price / event.currHeadCount
-                        )
-                    }",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
 
             // Display joined users
             item {
@@ -182,7 +197,8 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
             }
             joinedUsers.forEach { user ->
                 item {
-                    val fontWeight = if (user.userId == userId) FontWeight.Bold else FontWeight.Normal
+                    val fontWeight =
+                        if (user.userId == userId) FontWeight.Bold else FontWeight.Normal
                     Text(
                         text = "- ${user.displayName}    ${user.phoneNo}",
                         style = MaterialTheme.typography.body1.copy(fontWeight = fontWeight),
@@ -222,8 +238,51 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                     }
                 }
             }
+
+            if (EventDataSource.isEventOwner(userId, eventId)) {
+                item {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(
+                            onClick = { expanded = true },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Change Event Status")
+                        }
+                        if (expanded) {
+                            Column {
+                                Text(text = "Please pick an option:")
+                                EventStatus.values()
+                                    .filter{it!=EventStatus.Joined}
+                                    .forEach { status ->
+                                    Button(
+                                        onClick = {
+                                            selectedStatus = status
+                                            expanded = false
+                                            // Update the event status here only if the selected status is not "Available"
+                                            if (selectedStatus != EventStatus.Available) {
+                                                EventDataSource.updateEventStatus(eventId, selectedStatus)
+                                                // Navigate to the history page
+                                                navController.navigate("history/$userId")
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(status.name)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
         }
+    }
+
+
 
         if (showDialog) {
             AlertDialog(
@@ -244,6 +303,8 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
             )
         }
     }
+
+
 
 
 @Preview
