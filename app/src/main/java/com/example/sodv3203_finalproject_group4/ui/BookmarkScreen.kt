@@ -49,6 +49,7 @@ import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
+import com.example.sodv3203_finalproject_group4.users
 import kotlin.math.ceil
 
 @Composable
@@ -107,7 +108,7 @@ fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int)
                 contentScale = ContentScale.Crop
             )
             Text(
-                text = "Event by: ${event.eventBy}",
+                text = "Event by: ${(users.find { it.userId == event.eventBy.toInt() })?.displayName}",
                 modifier = Modifier.padding(5.dp)
             )
         }
