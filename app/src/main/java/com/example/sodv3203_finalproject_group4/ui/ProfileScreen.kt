@@ -34,6 +34,7 @@ fun ProfileScreen(navController: NavController, userId:Int) {
     var email by remember { mutableStateOf(user.email) }
     var phoneNo  by remember { mutableStateOf(user.phoneNo) }
     var userIndex = users.indexOfFirst { it.userId == userId }
+    var showDialog by remember { mutableStateOf(false) }
 
 
     /*
@@ -49,8 +50,8 @@ fun ProfileScreen(navController: NavController, userId:Int) {
             Text(
                 text = user.displayName,
                 style = MaterialTheme.typography.h5,
-                modifier = Modifier.padding(bottom = 16.dp),
-                color = MaterialTheme.colors.background
+                modifier = Modifier.padding(bottom = 16.dp)
+                //color = MaterialTheme.colors.background
             )
 
             // Group 4 and Email (Centered)
@@ -62,8 +63,8 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                 // Email
                 Text(
                     text = user.email,
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.background
+                    style = MaterialTheme.typography.body1
+                    //color = MaterialTheme.colors.background
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -71,8 +72,8 @@ fun ProfileScreen(navController: NavController, userId:Int) {
             // Divider line
             Divider(
                 thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                color = MaterialTheme.colors.background
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                //color = MaterialTheme.colors.background
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -90,7 +91,7 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                 Text(
                     text = "Edit Profile",
                     style = MaterialTheme.typography.button,
-                    color = MaterialTheme.colors.background
+                    //color = MaterialTheme.colors.background
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -136,11 +137,27 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                             )
                             // Notify DataSource about the update
                             EventDataSource.updateUser(user.userId, users[userIndex]) // Update the user in the Datasource
+                            showDialog = true
                         }
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text("Save")
+                }
+
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        title = { Text(text = "Success") },
+                        text = { Text(text = "The profile is updated.") },
+                        confirmButton = {
+                            Button(
+                                onClick = { showDialog = false },
+                            ) {
+                                Text(text = "OK")
+                            }
+                        }
+                    )
                 }
             }
 
