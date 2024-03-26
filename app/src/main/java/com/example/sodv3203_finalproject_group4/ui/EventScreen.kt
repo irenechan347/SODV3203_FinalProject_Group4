@@ -230,7 +230,10 @@ fun EventScreen(userId: Int, eventId: Int) {
                 text = { Text(text = "The event is joined.") },
                 confirmButton = {
                     Button(
-                        onClick = { showDialog = false },
+                        onClick = {
+                            showDialog = false
+
+                        }
                     ) {
                         Text(text = "OK")
                     }
