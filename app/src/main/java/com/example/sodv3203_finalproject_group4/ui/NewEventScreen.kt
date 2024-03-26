@@ -57,6 +57,10 @@ import androidx.compose.ui.text.TextStyle
 @Composable
 fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int = -1) {
 
+    val fromEvent = remember {
+        events.find { it.eventId == eventId }
+    }
+
     // Find the maximum event ID from the existing event list
     val maxEventId = events.maxOfOrNull { it.eventId } ?: 0
 
@@ -77,15 +81,15 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
     var selectedImageUri by remember { mutableStateOf<String?>(null) }
 
     // Define state variables for the number of people and the price
-    var numberOfPeople by remember { mutableIntStateOf(1) }
-    var price by remember { mutableDoubleStateOf(0.0) }
+    var numberOfPeople by remember { mutableIntStateOf(fromEvent?.currHeadCount ?: 1) }
+    var price by remember { mutableDoubleStateOf(fromEvent?.price ?: 0.0) }
 
     // Calculate price per share based on the input values
     var pricePerShare by remember { mutableDoubleStateOf(0.0) }
     pricePerShare = price / numberOfPeople
 
 // Define a variable to hold the selected category ID
-    var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
+    var selectedCategoryId by remember { mutableStateOf<Int?>(fromEvent?.categoryId ?: null) }
     var selectedCategory by remember { mutableStateOf<EventCategory?>(null) }
 
 // Update selectedCategoryId and selectedCategory when a category is selected
@@ -96,17 +100,13 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
     }
 
     // Define a state variable to hold the product name
-    var productName by remember { mutableStateOf("") }
+    var productName by remember { mutableStateOf(fromEvent?.productName ?: "") }
 
     // Define a mutable state variable to hold the location value
-    var location by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf(fromEvent?.location ?: "") }
 
     // Define a mutable state for showDialog
     var showDialog by remember { mutableStateOf(false) }
-
-    val fromEvent = remember {
-        events.find { it.eventId == eventId }
-    }
 
     val chooseImageLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
@@ -221,7 +221,7 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
                     selectedCategory = categories.find { it.categoryId == fromEvent.categoryId },
                     onCategorySelected = onCategorySelected,
                     fromEvent = fromEvent,
-                    selectedCategoryId = selectedCategoryId,
+                    selectedCategoryId = fromEvent.categoryId,
                     categoryMap = categoryMap
                 )
             } else {
@@ -282,15 +282,28 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
 
         // 5. Row with People icon and input box for number
         item {
-            PeopleInputRow(
-                iconId = R.drawable.people,
-                hint = "Number of People (2-4)",
-                onNumberOfPeopleChange = { newValue ->
-                    numberOfPeople = newValue
-                    // Recalculate price per share when the number of people changes
-                    pricePerShare = ceil(price / newValue * 10) / 10
-                }
-            )
+            if (fromEvent != null) {
+                PeopleInputRow(
+                    iconId = R.drawable.people,
+                    hint = "Number of People (2-4)",
+                    initialText = fromEvent.currHeadCount.toString() ?: "",
+                    onNumberOfPeopleChange = { newValue ->
+                        numberOfPeople = newValue
+                        // Recalculate price per share when the number of people changes
+                        pricePerShare = ceil(price / newValue * 10) / 10
+                    }
+                )
+            } else {
+                PeopleInputRow(
+                    iconId = R.drawable.people,
+                    hint = "Number of People (2-4)",
+                    onNumberOfPeopleChange = { newValue ->
+                        numberOfPeople = newValue
+                        // Recalculate price per share when the number of people changes
+                        pricePerShare = ceil(price / newValue * 10) / 10
+                    }
+                )
+            }
         }
 
         // 6. Row with Calendar icon and date inputs
@@ -348,6 +361,7 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
             PriceInputRow(
                 iconId = R.drawable.dollar,
                 hint = "Product Price",
+                initialPrice = fromEvent?.price ?: 0.0,
                 numberOfPeople = numberOfPeople,
             ) { newValue ->
                 price = newValue
@@ -567,6 +581,7 @@ fun TextInputRow(
 fun PeopleInputRow(
     iconId: Int,
     hint: String,
+    initialText: String = "",
     onNumberOfPeopleChange: (Int) -> Unit
 ) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -587,7 +602,7 @@ fun PeopleInputRow(
         Spacer(modifier = Modifier.width(8.dp))
 
         // Input field
-        var text by remember { mutableStateOf(TextFieldValue()) }
+        var text by remember { mutableStateOf(TextFieldValue(initialText)) }
 
         OutlinedTextField(
             value = text,
@@ -655,11 +670,14 @@ fun DateInputField(
 fun PriceInputRow(
     iconId: Int,
     hint: String,
+    initialPrice: Double = 0.0,
     numberOfPeople: Int, // Number of people input
     onValueChange: (Double) -> Unit // Callback for price value change
 ) {
+    val initialPricePerShare = ceil(initialPrice / numberOfPeople * 10) / 10
+
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    var pricePerShare by remember { mutableDoubleStateOf(0.0) } // Initialize pricePerShare
+    var pricePerShare by remember { mutableDoubleStateOf(initialPricePerShare) } // Initialize pricePerShare
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -677,7 +695,7 @@ fun PriceInputRow(
         Spacer(modifier = Modifier.width(8.dp))
 
         // Input box for price
-        var text by remember { mutableStateOf(TextFieldValue()) }
+        var text by remember { mutableStateOf(TextFieldValue(initialPrice.toString())) }
 
         OutlinedTextField(
             value = text,
