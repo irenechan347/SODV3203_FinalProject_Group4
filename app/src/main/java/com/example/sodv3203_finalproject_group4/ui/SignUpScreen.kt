@@ -21,6 +21,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import com.example.sodv3203_finalproject_group4.data.UserSessionManager
 import com.example.sodv3203_finalproject_group4.users
 
 @Composable
@@ -30,7 +31,9 @@ fun SignUpScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var phoneNo by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var showDialog by remember { mutableStateOf(false) }
+    var showProfileCreatedDialog by remember { mutableStateOf(false) }
+    var showEmailExistDialog by remember { mutableStateOf(false) }
+    var userCreatedSuccessfully by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.padding(16.dp)) {
 
@@ -90,6 +93,15 @@ fun SignUpScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
+
+                    val isEmailExists = users.any { it.email == email }
+                    if (isEmailExists) {
+                        // Show AlertDialog if the email already exists
+                        showEmailExistDialog = true
+                        return@Button
+                    }
+
+                    userCreatedSuccessfully = true
                     val largestUserId = users.maxOfOrNull { it.userId } ?: 0
                     val newUser = User(
                         userId = largestUserId + 1,
@@ -100,7 +112,8 @@ fun SignUpScreen(navController: NavController) {
                         password = password
                     )
                     EventDataSource.addUser(newUser) // Add the user to the data source
-                    showDialog = true
+                    UserSessionManager.login(newUser.userId)
+                    showProfileCreatedDialog = true
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
@@ -109,7 +122,7 @@ fun SignUpScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    navController.popBackStack("signIn", inclusive = true)
+                    navController.navigate("signIn")
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
@@ -117,16 +130,18 @@ fun SignUpScreen(navController: NavController) {
             }
 
             val userToShow = users.find { it.email == email }
-            if (showDialog) {
+            if (showProfileCreatedDialog) {
                 AlertDialog(
-                    onDismissRequest = { showDialog = false },
+                    onDismissRequest = { showProfileCreatedDialog = false },
                     title = { Text(text = "Success") },
                     text = { Text(text = "Your profile has been created.") },
                     confirmButton = {
                         Button(
                             onClick = {
-                                // Navigate to the home screen with the user's ID
-                                userToShow?.let { navController.navigate("home/${it.userId}") }
+                                // Navigate to SignIn Page
+                                // userToShow?.let { navController.navigate("home/${it.userId}") }
+                                showProfileCreatedDialog = false
+                                navController.navigate("signIn")
                             }
                         ) {
                             Text(text = "OK")
@@ -135,9 +150,26 @@ fun SignUpScreen(navController: NavController) {
                 )
             }
 
+            if (showEmailExistDialog) {
+                AlertDialog(
+                    onDismissRequest = { showEmailExistDialog = false },
+                    title = { Text(text = "Error") },
+                    text = { Text(text = "User email is already registered.") },
+                    confirmButton = {
+                        Button(
+                            onClick = { showEmailExistDialog = false }
+                        ) {
+                            Text("OK")
+                        }
+                    }
+                )
+            }
+
         }
     }
 }
+
+
 
 @Preview
 @Composable

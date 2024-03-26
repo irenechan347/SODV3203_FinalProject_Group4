@@ -1,7 +1,7 @@
 [
   {
     "eventId": 1,
-    "userId": 1,
+    "userId": 2,
     "categoryId": 1,
     "productName": "Duracell  2A x 60 pcs",
     "location": "Sage Hill",
@@ -9,11 +9,11 @@
     "dateFrom": "2024-03-20",
     "dateTo": "2024-03-23",
     "price": 32.0,
-    "eventBy": "1",
+    "eventBy": "2",
     "status": "Available",
     "isBookmark": false,
     "imageName": "img_event_1",
-    "joinedUsers": [1, 2]
+    "joinedUsers": [2]
   },
   {
     "eventId": 2,
@@ -45,7 +45,7 @@
     "status": "Paid",
     "isBookmark": false,
     "imageName": "img_event_8",
-    "joinedUsers": [1, 4]
+    "joinedUsers": [1, 3]
   },
   {
     "eventId": 4,
@@ -125,7 +125,7 @@
     "status": "Available",
     "isBookmark": true,
     "imageName": "img_event_6",
-    "joinedUsers": [1, 3]
+    "joinedUsers": [2, 3]
   },
   {
     "eventId": 9,

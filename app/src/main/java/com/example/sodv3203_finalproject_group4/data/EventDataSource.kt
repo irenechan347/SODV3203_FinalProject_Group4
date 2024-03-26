@@ -114,3 +114,23 @@ object EventDataSource {
         Log.d("EventDataSource", "Saved to path: ${file.absolutePath}")
     }
 }
+
+object UserSessionManager {
+    private var userId: Int? = null
+
+    fun login(userId: Int) {
+        this.userId = userId
+        // You might also perform additional tasks here, such as storing the user ID in SharedPreferences
+    }
+
+    fun logout() {
+        userId = null
+        // You might also perform additional tasks here, such as clearing the user ID from SharedPreferences
+    }
+
+    fun getUserId(): Int? {
+        return userId
+    }
+
+    // You can add more methods as needed, such as checking if a user is logged in, etc.
+}

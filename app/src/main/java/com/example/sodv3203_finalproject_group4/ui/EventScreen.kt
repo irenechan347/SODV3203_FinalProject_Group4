@@ -39,10 +39,12 @@ import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.users
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun EventScreen(userId: Int, eventId: Int) {
+fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
     val event = remember { events.firstOrNull { it.eventId == eventId } }
     val user = remember { users.firstOrNull { it.userId == userId } }
     var showDialog by remember { mutableStateOf(false) }
@@ -197,21 +199,21 @@ fun EventScreen(userId: Int, eventId: Int) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
-
             // Join button
             if (event.status == EventStatus.Available && !isUserJoined && joinedUsers.size < event.currHeadCount) {
                 item {
                     Button(
                         onClick = {
                             showDialog = true
-                            val updatedEventList = events.map {
-                                if (it.eventId == eventId) {
-                                    it.copy(joinedUsers = it.joinedUsers + userId)
+                            val updatedEvent = event.copy(
+                                joinedUsers = event.joinedUsers + userId,
+                                status = if (event.joinedUsers.size + 1 == event.currHeadCount) {
+                                    EventStatus.Joined
                                 } else {
-                                    it
+                                    event.status
                                 }
-                            }
-                            // Update the eventList with the new list of joined users
+                            )
+                            // Update the event with the new list of joined users and updated status
                             EventDataSource.updateEventList(updatedEvent)
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -219,6 +221,7 @@ fun EventScreen(userId: Int, eventId: Int) {
                         Text(text = "Join")
                     }
                 }
+            }
             }
         }
 
@@ -229,7 +232,11 @@ fun EventScreen(userId: Int, eventId: Int) {
                 text = { Text(text = "The event is joined.") },
                 confirmButton = {
                     Button(
-                        onClick = { showDialog = false },
+                        onClick = {
+                            showDialog = false
+                            // navController.navigate("home/$userId")
+                            navController.popBackStack()
+                        }
                     ) {
                         Text(text = "OK")
                     }
@@ -237,12 +244,13 @@ fun EventScreen(userId: Int, eventId: Int) {
             )
         }
     }
-}
+
 
 @Preview
 @Composable
 fun EventScreenPreview() {
     ShoppingBuddyAppTheme {
-        EventScreen(2, 4,)
+        val navController = rememberNavController()
+        EventScreen(navController,2, 4,)
     }
 }
