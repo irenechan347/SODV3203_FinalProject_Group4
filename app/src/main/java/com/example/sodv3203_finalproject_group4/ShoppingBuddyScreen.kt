@@ -270,7 +270,7 @@ fun ShoppingBuddyApp(
             composable("eventScreen/{userId}/{eventId}") { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
                 val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: throw IllegalArgumentException("Event ID not found")
-                EventScreen(userId = userId, eventId = eventId,)
+                EventScreen(userId = userId, navController = navController, eventId = eventId,)
             }
 
             composable(route = "${ShoppingBuddyScreen.History.name}/{userId}") {backStackEntry ->

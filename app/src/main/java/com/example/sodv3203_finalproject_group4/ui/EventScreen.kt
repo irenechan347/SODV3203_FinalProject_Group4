@@ -39,10 +39,12 @@ import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.users
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun EventScreen(userId: Int, eventId: Int) {
+fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
     val event = remember { events.firstOrNull { it.eventId == eventId } }
     val user = remember { users.firstOrNull { it.userId == userId } }
     var showDialog by remember { mutableStateOf(false) }
@@ -232,7 +234,8 @@ fun EventScreen(userId: Int, eventId: Int) {
                     Button(
                         onClick = {
                             showDialog = false
-
+                            // navController.navigate("home/$userId")
+                            navController.popBackStack()
                         }
                     ) {
                         Text(text = "OK")
@@ -247,6 +250,7 @@ fun EventScreen(userId: Int, eventId: Int) {
 @Composable
 fun EventScreenPreview() {
     ShoppingBuddyAppTheme {
-        EventScreen(2, 4,)
+        val navController = rememberNavController()
+        EventScreen(navController,2, 4,)
     }
 }
