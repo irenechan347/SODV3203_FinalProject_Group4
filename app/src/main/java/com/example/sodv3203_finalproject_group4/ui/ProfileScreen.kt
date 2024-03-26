@@ -33,6 +33,7 @@ fun ProfileScreen(navController: NavController, userId:Int) {
     //var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf(user.email) }
     var phoneNo  by remember { mutableStateOf(user.phoneNo) }
+    var password by remember{ mutableStateOf(user.password) }
     var userIndex = users.indexOfFirst { it.userId == userId }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -125,6 +126,13 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                     label = { Text("Phone Number") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("password") },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
@@ -133,7 +141,8 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                                 displayName = displayName,
                                 name = name,
                                 email = email,
-                                phoneNo = phoneNo
+                                phoneNo = phoneNo,
+                                password = password
                             )
                             // Notify DataSource about the update
                             EventDataSource.updateUser(user.userId, users[userIndex]) // Update the user in the Datasource
