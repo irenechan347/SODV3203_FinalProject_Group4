@@ -13,6 +13,7 @@ enum class EventStatus() {
 
 data class Event(
     var eventId: Int,
+    var userId: Int,
     var categoryId: Int,
     var productName: String,
     var location: String,

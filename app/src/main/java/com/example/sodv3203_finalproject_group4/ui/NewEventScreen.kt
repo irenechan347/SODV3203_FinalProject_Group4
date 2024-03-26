@@ -740,23 +740,13 @@ fun CreateButton(
     var showDialog by remember { mutableStateOf(false) }
 
     Button(onClick = {
-        Log.d("CreateButton", "Button clicked")
-        Log.d("CreateButton", "newEventId: $newEventId")
-        Log.d("CreateButton", "selectedCategoryId: $selectedCategoryId")
-        Log.d("CreateButton", "productName: $productName")
-        Log.d("CreateButton", "location: $location")
-        Log.d("CreateButton", "numberOfPeople: $numberOfPeople")
-        Log.d("CreateButton", "firstSelectedDate: $formattedFirstDate")
-        Log.d("CreateButton", "secondSelectedDate: $formattedSecondDate")
-        Log.d("CreateButton", "price: $price")
-        Log.d("CreateButton", "userId: $userId")
-        Log.d("CreateButton", "fromEvent: $fromEvent")
 
         // Check if selectedCategoryId is not null and other required fields are not empty
         if (selectedCategoryId != null && productName.isNotBlank() && location.isNotBlank() && numberOfPeople>0 && price>0) {
             // Create the event
             val newEvent = Event(
                 eventId = newEventId,
+                userId = userId,
                 categoryId = selectedCategoryId!!,
                 productName = productName,
                 location = location,
@@ -767,8 +757,8 @@ fun CreateButton(
                 eventBy = userId.toString(),
                 status = EventStatus.Available, // Default status
                 isBookmark = false, // Default value
-                imageName = fromEvent?.imageName
-                    ?: "img_event_1" // Use the imageId from fromEvent if available, otherwise use the default image
+                imageName = fromEvent?.imageName ?: "img_event_1", // Use the imageId from fromEvent if available, otherwise use the default image
+                joinedUsers = mutableListOf(userId)
             )
 
             // Add the new event to the datasource

@@ -1,6 +1,7 @@
 [
   {
     "eventId": 1,
+    "userId": 1,
     "categoryId": 1,
     "productName": "Duracell  2A x 60 pcs",
     "location": "Sage Hill",
@@ -16,6 +17,7 @@
   },
   {
     "eventId": 2,
+    "userId": 3,
     "categoryId": 3,
     "productName": "Cherry x 3kg",
     "location": "City Hall",
@@ -31,6 +33,7 @@
   },
   {
     "eventId": 3,
+    "userId": 3,
     "categoryId": 2,
     "productName": "Whole Grain Bread (2 Loaves)",
     "location": "The Baker's Corner",
@@ -46,6 +49,7 @@
   },
   {
     "eventId": 4,
+    "userId": 2,
     "categoryId": 2,
     "productName": "Organic Flour (5kg Bag)",
     "location": "The Miller's Mill",
@@ -61,6 +65,7 @@
   },
   {
     "eventId": 5,
+    "userId": 4,
     "categoryId": 3,
     "productName": "Water Melon (10 Pcs)",
     "location": "Herron Mews",
@@ -76,6 +81,7 @@
   },
   {
     "eventId": 6,
+    "userId": 2,
     "categoryId": 1,
     "productName": "Duracell  2A x 60 pcs",
     "location": "Sage Hill",
@@ -91,6 +97,7 @@
   },
   {
     "eventId": 7,
+    "userId": 1,
     "categoryId": 1,
     "productName": "Duracell  2A x 60 pcs",
     "location": "Sage Hill",
@@ -98,14 +105,15 @@
     "dateFrom": "2024-03-27",
     "dateTo": "2024-03-30",
     "price": 32.0,
-    "eventBy": "John",
+    "eventBy": "Oliver",
     "status": "Available",
     "isBookmark": true,
     "imageName": "img_event_6",
-    "joinedUsers": [2, 4]
+    "joinedUsers": [1, 4]
   },
   {
     "eventId": 8,
+    "userId": 3,
     "categoryId": 1,
     "productName": "Duracell  2A x 60 pcs",
     "location": "Sage Hill",
@@ -121,6 +129,7 @@
   },
   {
     "eventId": 9,
+    "userId": 1,
     "categoryId": 3,
     "productName": "Strawberry 1(box)",
     "location": "Herron Mews",
@@ -128,14 +137,15 @@
     "dateFrom": "2024-03-29",
     "dateTo": "2024-04-01",
     "price": 36.0,
-    "eventBy": "Sally",
+    "eventBy": "Oliver",
     "status": "Available",
     "isBookmark": true,
     "imageName": "img_event_3",
-    "joinedUsers": [3]
+    "joinedUsers": [1]
   },
   {
     "eventId": 10,
+    "userId": 4,
     "categoryId": 2,
     "productName": "Bread 20 Pcs",
     "location": "South Center",
