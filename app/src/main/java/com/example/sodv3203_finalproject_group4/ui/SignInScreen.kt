@@ -11,7 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.sodv3203_finalproject_group4.data.Datasource
+import com.example.sodv3203_finalproject_group4.users
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 
 @Composable
@@ -36,7 +36,7 @@ fun SignInScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                val user = Datasource.users.find { it.email == email }
+                val user = users.find { it.email == email }
                 user?.let {
                     UserSessionManager.login(it.userId) // Store userId in session manager
                     navController.navigate("home/${it.userId}")

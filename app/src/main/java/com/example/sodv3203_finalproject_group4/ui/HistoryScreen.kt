@@ -35,8 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.LoadImage
-import com.example.sodv3203_finalproject_group4.data.Datasource
-import com.example.sodv3203_finalproject_group4.data.Datasource.eventList
+import com.example.sodv3203_finalproject_group4.categoryMap
 import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventStatus
@@ -74,7 +73,7 @@ fun HistoryList(eventList: List<Event>, navController: NavHostController, userId
 
 @Composable
 fun HistoryListItem(event: Event, navController: NavHostController, userId:Int) {
-    val categoryName = Datasource.categoryMap[event.categoryId]
+    val categoryName = categoryMap[event.categoryId]
 
     Row(
         modifier = Modifier

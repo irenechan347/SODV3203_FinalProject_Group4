@@ -21,7 +21,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sodv3203_finalproject_group4.R
-import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import java.util.*
 import androidx.compose.material.icons.Icons
@@ -48,13 +47,17 @@ import android.util.Log
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.LoadImage
+import com.example.sodv3203_finalproject_group4.categories
+import com.example.sodv3203_finalproject_group4.categoryMap
+import com.example.sodv3203_finalproject_group4.data.EventDataSource
+import com.example.sodv3203_finalproject_group4.events
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int = -1) {
 
     // Find the maximum event ID from the existing event list
-    val maxEventId = Datasource.eventList.maxOfOrNull { it.eventId } ?: 0
+    val maxEventId = events.maxOfOrNull { it.eventId } ?: 0
 
     // Increment the maximum event ID by 1 to generate a new event ID
     val newEventId = maxEventId + 1
@@ -101,7 +104,7 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
     var showDialog by remember { mutableStateOf(false) }
 
     val fromEvent = remember {
-        Datasource.eventList.find { it.eventId == eventId }
+        events.find { it.eventId == eventId }
     }
 
     val chooseImageLauncher =
@@ -214,11 +217,11 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
         item {
             if (fromEvent != null) {
                 CategoryRow(
-                    selectedCategory = Datasource.categoryList.find { it.categoryId == fromEvent.categoryId },
+                    selectedCategory = categories.find { it.categoryId == fromEvent.categoryId },
                     onCategorySelected = onCategorySelected,
                     fromEvent = fromEvent,
                     selectedCategoryId = selectedCategoryId,
-                    categoryMap = Datasource.categoryMap
+                    categoryMap = categoryMap
                 )
             } else {
                 CategoryRow(
@@ -226,7 +229,7 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
                     onCategorySelected = onCategorySelected,
                     fromEvent = null, // Pass null for fromEvent when it is not available
                     selectedCategoryId = selectedCategoryId,
-                    categoryMap = Datasource.categoryMap
+                    categoryMap = categoryMap
                 )
             }
         }
@@ -477,7 +480,7 @@ fun CategoryRow(
             onDismissRequest = { expanded = false },
             modifier = Modifier.width(120.dp) // Adjust width as needed
         ) {
-            Datasource.categoryList.forEach { category ->
+            categories.forEach { category ->
                 DropdownMenuItem(onClick = {
                     onCategorySelected(category)
                     expanded = false
@@ -769,7 +772,7 @@ fun CreateButton(
             )
 
             // Add the new event to the datasource
-            Datasource.addEvent(newEvent)
+            EventDataSource.addEvent(newEvent)
 
             // Call the callback function to notify that event is created
             onEventCreated()

@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,18 +44,19 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.LoadImage
-import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import androidx.compose.material.Checkbox
+import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.EventStatus
+import com.example.sodv3203_finalproject_group4.users
 
 @Composable
 fun HomeScreen(navController: NavHostController, userId:Int) {
     var searchText by remember { mutableStateOf("") }
     var showAvailableEvents by remember { mutableStateOf(false) }
     val user = remember {
-        Datasource.users.find { it.userId == userId }
+        users.find { it.userId == userId }
     }
 
 
@@ -130,12 +130,12 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
 
         // Filtered events based on product name search and availability
         val filteredEvents = if (showAvailableEvents) {
-            Datasource.eventList.filter {
+            events.filter {
                 it.status == EventStatus.Available &&
                         it.productName.contains(searchText, ignoreCase = true)
             }
         } else {
-            Datasource.eventList.filter {
+            events.filter {
                 it.productName.contains(searchText, ignoreCase = true)
             }
         }

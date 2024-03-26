@@ -25,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sodv3203_finalproject_group4.LoadImage
 import com.example.sodv3203_finalproject_group4.R
-import com.example.sodv3203_finalproject_group4.data.Datasource
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -33,19 +32,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.material.AlertDialog
+import com.example.sodv3203_finalproject_group4.categories
+import com.example.sodv3203_finalproject_group4.categoryMap
+import com.example.sodv3203_finalproject_group4.data.EventDataSource
+import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.EventStatus
+import com.example.sodv3203_finalproject_group4.users
 
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun EventScreen(userId: Int, eventId: Int) {
-    val event = remember { Datasource.eventList.firstOrNull { it.eventId == eventId } }
-    val user = remember { Datasource.users.firstOrNull { it.userId == userId } }
+    val event = remember { events.firstOrNull { it.eventId == eventId } }
+    val user = remember { users.firstOrNull { it.userId == userId } }
     var showDialog by remember { mutableStateOf(false) }
 
     if (event != null) {
         val joinedUsers =
-            event.joinedUsers.mapNotNull { userId -> Datasource.users.firstOrNull { it.userId == userId } }
+            event.joinedUsers.mapNotNull { userId -> users.firstOrNull { it.userId == userId } }
         val isUserJoined = event.joinedUsers.contains(userId)
 
         // Define updatedEvent based on whether the user is already joined or not
@@ -79,11 +83,11 @@ fun EventScreen(userId: Int, eventId: Int) {
                         .clickable(enabled = false) { },
                 ) {
                     CategoryRow(
-                        selectedCategory = Datasource.categoryList.find { it.categoryId == event.categoryId },
+                        selectedCategory = categories.find { it.categoryId == event.categoryId },
                         onCategorySelected = { /* Not applicable for EventScreen */ },
                         fromEvent = event,
                         selectedCategoryId = event.categoryId,
-                        categoryMap = Datasource.categoryMap
+                        categoryMap = categoryMap
                     )
                 }
             }
@@ -199,7 +203,7 @@ fun EventScreen(userId: Int, eventId: Int) {
                     Button(
                         onClick = {
                             showDialog = true
-                            val updatedEventList = Datasource.eventList.map {
+                            val updatedEventList = events.map {
                                 if (it.eventId == eventId) {
                                     it.copy(joinedUsers = it.joinedUsers + userId)
                                 } else {
@@ -207,7 +211,7 @@ fun EventScreen(userId: Int, eventId: Int) {
                                 }
                             }
                             // Update the eventList with the new list of joined users
-                            Datasource.updateEventList(updatedEvent)
+                            EventDataSource.updateEventList(updatedEvent)
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {

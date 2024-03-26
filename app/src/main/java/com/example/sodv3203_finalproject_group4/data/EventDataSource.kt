@@ -3,9 +3,11 @@ package com.example.sodv3203_finalproject_group4.data
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventCategory
 import com.example.sodv3203_finalproject_group4.model.User
+import com.example.sodv3203_finalproject_group4.users
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
@@ -17,6 +19,26 @@ object EventDataSource {
     private const val EVENTS_JSON_FILENAME = "events.json"
     private const val CATEGORIES_JSON_FILENAME = "categories.json"
     private const val USERS_JSON_FILENAME = "users.json"
+
+    fun updateUser(userId: Int, updatedUser: User) {
+        // Find the index of the user with the given userId
+        val index = users.indexOfFirst { it.userId == userId }
+        if (index != -1) {
+            // Update the user data at the found index
+            users[index] = updatedUser
+        }
+    }
+
+    fun addEvent(event: Event) {
+        events.add(event)
+    }
+
+    fun updateEventList(updatedEvent: Event) {
+        val index = events.indexOfFirst { it.eventId == updatedEvent.eventId }
+        if (index != -1) {
+            events[index] = updatedEvent
+        }
+    }
 
     fun loadEvents(context: Context): List<Event> {
         val jsonString = loadJsonFromAsset(context, EVENTS_JSON_FILENAME)

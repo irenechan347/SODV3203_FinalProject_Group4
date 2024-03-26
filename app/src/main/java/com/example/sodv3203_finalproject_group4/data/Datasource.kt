@@ -7,6 +7,7 @@ import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.model.User
 import java.text.SimpleDateFormat
 
+/*
 object Datasource {
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 
@@ -47,11 +48,11 @@ object Datasource {
         EventCategory(1, "Batteries"),
         EventCategory(2, "Bakery"),
         EventCategory(3, "Fruits")
-        /*
-        EventCategory(1, R.string.cat_batteries),
-        EventCategory(2, R.string.cat_bakery),
-        EventCategory(3, R.string.cat_fruits),
-        */
+
+        //EventCategory(1, R.string.cat_batteries),
+        //EventCategory(2, R.string.cat_bakery),
+        //EventCategory(3, R.string.cat_fruits),
+
         //EventCategory(4, R.string.cat_others)
     )
 
@@ -224,3 +225,4 @@ object Datasource {
         ),
     )
 }
+*/

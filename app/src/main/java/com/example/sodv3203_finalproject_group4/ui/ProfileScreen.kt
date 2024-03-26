@@ -17,14 +17,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sodv3203_finalproject_group4.data.Datasource
+import com.example.sodv3203_finalproject_group4.data.EventDataSource
 import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
+import com.example.sodv3203_finalproject_group4.users
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 
 @Composable
 fun ProfileScreen(navController: NavController, userId:Int) {
-    var users = Datasource.users.toMutableList()
+    var users = users.toMutableList()
     val user = users.find { it.userId == userId } ?: User(-1, "", "", "", "") // Default user if not found
     //var user = Datasource.getUser(userId)
     var displayName by remember { mutableStateOf(user.displayName) }
@@ -134,7 +135,7 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                                 phoneNo = phoneNo
                             )
                             // Notify DataSource about the update
-                            Datasource.updateUser(user.userId, users[userIndex]) // Update the user in the Datasource
+                            EventDataSource.updateUser(user.userId, users[userIndex]) // Update the user in the Datasource
                         }
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
