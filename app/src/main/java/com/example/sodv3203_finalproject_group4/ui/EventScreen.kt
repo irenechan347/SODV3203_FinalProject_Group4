@@ -197,21 +197,21 @@ fun EventScreen(userId: Int, eventId: Int) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
-
             // Join button
             if (event.status == EventStatus.Available && !isUserJoined && joinedUsers.size < event.currHeadCount) {
                 item {
                     Button(
                         onClick = {
                             showDialog = true
-                            val updatedEventList = events.map {
-                                if (it.eventId == eventId) {
-                                    it.copy(joinedUsers = it.joinedUsers + userId)
+                            val updatedEvent = event.copy(
+                                joinedUsers = event.joinedUsers + userId,
+                                status = if (event.joinedUsers.size + 1 == event.currHeadCount) {
+                                    EventStatus.Joined
                                 } else {
-                                    it
+                                    event.status
                                 }
-                            }
-                            // Update the eventList with the new list of joined users
+                            )
+                            // Update the event with the new list of joined users and updated status
                             EventDataSource.updateEventList(updatedEvent)
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -219,6 +219,7 @@ fun EventScreen(userId: Int, eventId: Int) {
                         Text(text = "Join")
                     }
                 }
+            }
             }
         }
 
@@ -237,7 +238,7 @@ fun EventScreen(userId: Int, eventId: Int) {
             )
         }
     }
-}
+
 
 @Preview
 @Composable
