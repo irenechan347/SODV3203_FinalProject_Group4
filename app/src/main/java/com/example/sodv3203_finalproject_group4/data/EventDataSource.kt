@@ -54,6 +54,10 @@ object EventDataSource {
         return Gson().fromJson(jsonString, categoryType)
     }
 
+    fun addUser(user: User) {
+        users.add(user)
+    }
+
     fun loadUsers(context: Context): List<User> {
         val jsonString = loadJsonFromAsset(context, USERS_JSON_FILENAME)
         val userType = object : TypeToken<List<User>>() {}.type
