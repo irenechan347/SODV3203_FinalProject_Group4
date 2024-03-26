@@ -197,7 +197,10 @@ fun EventItem(event: Event, navController: NavHostController, userId: Int) {
             }
             Spacer(modifier = Modifier.width(16.dp))
             IconButton(
-                onClick = { isBookmarked = !isBookmarked }
+                onClick = {
+                    isBookmarked = !isBookmarked
+                    event.isBookmark = !event.isBookmark
+                }
             ) {
                 Icon(
                     imageVector = if (isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,

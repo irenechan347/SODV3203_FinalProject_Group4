@@ -2,6 +2,7 @@ package com.example.sodv3203_finalproject_group4.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -79,13 +84,17 @@ fun BookmarkList(eventList: List<Event>, navController: NavHostController, userI
 fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int) {
     //val categoryName = Datasource.categoryMap[event.categoryId]
     val categoryName = categoryMap[event.categoryId]
-    //var isBookmarked by remember { mutableStateOf(event.isBookmark) }
+    var isBookmarked by remember { mutableStateOf(event.isBookmark) }
     val context = LocalContext.current
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .clickable {
+                // Navigate to EventScreen with appropriate parameters
+                navController.navigate("eventScreen/$userId/${event.eventId}")
+            }
     ) {
         Column {
             Image(
@@ -122,17 +131,12 @@ fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
-                        //isBookmarked = !isBookmarked
-                        Log.d("Events", events.toString())
+                        isBookmarked = !isBookmarked
                         event.isBookmark = !event.isBookmark
-                        Log.d("Events", events.toString())
-                        EventDataSource.saveEvents(context, events)
-                        //val loadedEvents = EventDataSource.loadEvents(context)
-                        //Log.d("Loaded Events", loadedEvents.toString())
                     }
                 ) {
                     Icon(
-                        imageVector = if (event.isBookmark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        imageVector = if (isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "Bookmark",
                         tint = Color(0xFFFF4500)
                     )
