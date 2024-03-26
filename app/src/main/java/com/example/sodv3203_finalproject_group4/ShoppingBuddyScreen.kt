@@ -220,7 +220,8 @@ fun ShoppingBuddyApp(
                 },
                 navController = navController
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.onSecondary
     ) { innerPadding ->
         //val uiState by viewModel.uiState.collectAsState()
 
