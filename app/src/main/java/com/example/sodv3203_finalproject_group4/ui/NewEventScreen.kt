@@ -52,6 +52,7 @@ import com.example.sodv3203_finalproject_group4.categoryMap
 import com.example.sodv3203_finalproject_group4.data.EventDataSource
 import com.example.sodv3203_finalproject_group4.events
 import androidx.compose.ui.text.TextStyle
+import com.example.sodv3203_finalproject_group4.users
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -117,7 +118,7 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
             }
         }
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "User ID: $userId", style = MaterialTheme.typography.h6)
+       // Text(text = "User ID: $userId", style = MaterialTheme.typography.h6)
         // This is just to verify that now userId is available
     }
 
@@ -127,92 +128,48 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
             .padding(10.dp)
     ) {
         item {
-            // Display the uploaded photo or the placeholder text
             Box(
                 modifier = Modifier
                     .size(140.dp)
-                    .padding(bottom = 8.dp),
+                    .fillMaxSize()
+                    .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.medium)
+                    .clickable {
+                        // Open file picker when the box is clicked
+                        chooseImageLauncher.launch("image/*")
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(140.dp)
-                        .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.medium)
-                        .clickable {
-                            // Open file picker when the box is clicked
-                            chooseImageLauncher.launch("image/*")
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Check if fromEvent is not null and if there's a selected image URI
-                    val defaultImageId = fromEvent?.imageName
+                // Check if fromEvent is not null and if there's a selected image URI
+                val defaultImageId = fromEvent?.imageName
 
-                    // Display the selected image or the upload icon
-                    if (isPhotoUploaded || defaultImageId != null) {
-                        val painter = if (isPhotoUploaded) {
-                            // Display the selected image
-                            rememberImagePainter(
-                                data = selectedImageUri,
-                                builder = {
-                                    crossfade(true)
-                                }
-                            )
-                        } else {
-                            // Display the default image based on imageId
-                            //painterResource(id = defaultImageId!!)
-                            LoadImage(defaultImageId!!)
+                // Display the selected image or the placeholder image
+                val defaultImageResourceId = defaultImageId?.toIntOrNull() ?: R.drawable.img_event_1
+                val painter = if (isPhotoUploaded) {
+                    // Display the selected image
+                    rememberImagePainter(
+                        data = selectedImageUri,
+                        builder = {
+                            crossfade(true)
                         }
-                        Image(
-                            painter = painter,
-                            contentDescription = "Uploaded Photo",
-                            modifier = Modifier
-                                .size(140.dp)
-                                .padding(bottom = 8.dp)
-                        )
-                        /*
-                        selectedImageUri?.let {
-                            // Display the selected image
-                            val painter = rememberImagePainter(
-                                data = it,
-                                builder = {
-                                    crossfade(true)
-                                }
-                            )
-                            Image(
-                                painter = painter,
-                                contentDescription = "Uploaded Photo",
-                                modifier = Modifier
-                                    .size(140.dp)
-                                    .padding(bottom = 8.dp)
-                            )
-                        }
-                         */
-                    } else {
-                        // Display the placeholder image
-                        Image(
-                            painter = painterResource(id = R.drawable.img_event_1),
-                            contentDescription = "Placeholder Image",
-                            modifier = Modifier
-                                .size(140.dp)
-                                .fillMaxSize()
-                                .padding(bottom = 8.dp)
-                        )
-                        // Display the upload icon
-//                        Text(
-//                            text = buildAnnotatedString {
-//                                withStyle(style = SpanStyle(fontSize = 12.sp)) {
-//                                    append("Click to\n")
-//                                }
-//                                withStyle(style = SpanStyle(fontSize = 12.sp)) {
-//                                    append("upload photo")
-//                                }
-//                            },
-//                            color = Color.Gray
-//                        )
-                    }
+                    )
+                } else {
+                    // Display the default image based on imageId
+                    painterResource(id = defaultImageResourceId)
                 }
+                Image(
+                    painter = painter,
+                    contentDescription = "Photo",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .aspectRatio(1f) // Maintain aspect ratio
+                        .clickable {
+                            // Open file picker when the image is clicked
+                            chooseImageLauncher.launch("image/*")
+                        }
+                )
             }
         }
+
 
         // 2. Row with Category Icon and a pull-down menu to select Category Name
         item {
@@ -399,13 +356,14 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
 
 @Composable
 fun ShowDataSentDialog(navController: NavHostController, userId: Int, onDismiss: () -> Unit) {
+    val user = users.find { it.userId == userId } ?: return // Ensure user exists
     AlertDialog(
         onDismissRequest = {
             onDismiss()
             navController.navigate("HomeScreen/$userId")
         },
-        title = { Text("Data Sent") },
-        text = { Text("The data has been successfully sent to the database.") },
+        title = { Text("New Event") },
+        text = { Text("A new Event is Created by ${user.displayName}") },
         confirmButton = {
             Button(
                 onClick = {
