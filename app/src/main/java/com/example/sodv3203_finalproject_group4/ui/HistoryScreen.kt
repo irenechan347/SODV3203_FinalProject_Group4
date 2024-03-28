@@ -46,7 +46,6 @@ import kotlin.math.ceil
 
 @Composable
 fun HistoryScreen(navController: NavHostController, userId:Int) {
-    //val filteredEventList = eventList.filter { it.status != EventStatus.Available  && it.joinedUsers.contains(userId) }
     val filteredEventList = events.filter { it.status != EventStatus.Available  && it.joinedUsers.contains(userId) }
 
     Column (
@@ -85,7 +84,7 @@ fun HistoryListItem(event: Event, navController: NavHostController, userId:Int) 
             .fillMaxWidth()
             .padding(16.dp)
             .clickable {
-                // Navigate to EventScreen with appropriate parameters
+                // Navigate to EventScreen with parameters
                 navController.navigate("eventScreen/$userId/${event.eventId}")
             }
     ) {

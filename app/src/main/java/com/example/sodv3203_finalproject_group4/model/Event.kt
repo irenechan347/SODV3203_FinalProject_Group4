@@ -1,6 +1,5 @@
 package com.example.sodv3203_finalproject_group4.model
 
-import androidx.annotation.DrawableRes
 import java.util.Date
 
 enum class EventStatus() {
@@ -24,7 +23,6 @@ data class Event(
     var eventBy: String,
     var status: EventStatus,
     var isBookmark: Boolean,
-    //@DrawableRes var imageId: Int,
     var imageName: String,
     var joinedUsers: List<Int> = emptyList()
 )
