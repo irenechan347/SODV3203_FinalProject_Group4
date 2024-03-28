@@ -128,19 +128,3 @@ object EventDataSource {
         Log.d("EventDataSource", "Saved to path: ${file.absolutePath}")
     }
 }
-
-object UserSessionManager {
-    private var userId: Int? = null
-
-    fun login(userId: Int) {
-        this.userId = userId
-    }
-
-    fun logout() {
-        userId = null
-    }
-
-    fun getUserId(): Int? {
-        return userId
-    }
-}
