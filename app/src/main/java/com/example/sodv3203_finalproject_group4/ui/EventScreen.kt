@@ -146,7 +146,7 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
             // Display price
             item {
                 Text(
-                    text = "$${event.price} (${String.format("%.1f", event.price / event.currHeadCount)} per share)",
+                    text = "$${event.price} ($${String.format("%.1f", event.price / event.currHeadCount)} per share)",
                     style = MaterialTheme.typography.body1,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -239,7 +239,7 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                 }
             }
 
-            if (EventDataSource.isEventOwner(userId, eventId)) {
+            if (EventDataSource.isEventOwner(userId, eventId)&& event.status == EventStatus.Available) {
                 item {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
