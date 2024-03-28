@@ -8,7 +8,7 @@
     "currHeadCount": 3,
     "dateFrom": "2024-03-20",
     "dateTo": "2024-03-23",
-    "price": 32.0,
+    "price": 36.0,
     "eventBy": "2",
     "status": "Available",
     "isBookmark": false,
@@ -205,7 +205,7 @@
     "status": "Available",
     "isBookmark": false,
     "imageName": "img_event_4",
-    "joinedUsers": [1, 4]
+    "joinedUsers": [4]
   },
   {
     "eventId": 14,
