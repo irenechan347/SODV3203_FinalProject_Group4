@@ -29,8 +29,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +64,7 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
     loadEventData(LocalContext.current)
     var searchText by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<EventCategory?>(null) }
+    var sortByDate by remember { mutableStateOf(false) }
     val user = remember {
         users.find { it.userId == userId }
     }
@@ -65,6 +72,12 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
         event.status == EventStatus.Available &&
                 event.productName.contains(searchText, ignoreCase = true) &&
                 (selectedCategory == null || event.categoryId == selectedCategory?.categoryId)
+    }
+    // Apply sorting if enabled
+    val sortedEvents = if (sortByDate) {
+        filteredEvents.sortedByDescending { it.dateFrom } // Sort events by dateFrom in descending order
+    } else {
+        filteredEvents // If sorting is not enabled, return the original list
     }
 
 
@@ -101,8 +114,8 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
                 value = searchText,
                 onValueChange = { searchText = it },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                    .fillMaxWidth(0.8f)
+                    .padding(10.dp, 16.dp),
                 placeholder = {
                     Text(
                         text = "Search by product name",
@@ -124,7 +137,6 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
                 }
             )
             Spacer(modifier = Modifier.width(16.dp))
-
         }
 
         // Filter buttons for each category
@@ -147,9 +159,35 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
             }
         }
 
+        // Sorting controls
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Sort by date:",
+                style = MaterialTheme.typography.subtitle1,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(
+                onClick = { sortByDate = !sortByDate }
+            ) {
+                Icon(
+                    imageVector = if (sortByDate) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                    contentDescription = "Sort by date",
+                    tint = MaterialTheme.colors.secondaryVariant
+                )
+            }
+        }
+
+
+
         // Display filtered events
         LazyColumn(modifier = Modifier.padding(8.dp)) {
-            items(filteredEvents) { event ->
+            items(sortedEvents) { event ->
                 EventItem(event = event, navController, userId)
             }
         }
