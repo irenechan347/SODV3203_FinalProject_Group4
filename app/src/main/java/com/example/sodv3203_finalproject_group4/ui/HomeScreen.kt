@@ -30,13 +30,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,7 +49,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.LoadImage
 import com.example.sodv3203_finalproject_group4.categories
 import com.example.sodv3203_finalproject_group4.events
-import com.example.sodv3203_finalproject_group4.loadEventData
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventCategory
 import com.example.sodv3203_finalproject_group4.model.EventStatus
@@ -55,7 +57,6 @@ import com.example.sodv3203_finalproject_group4.users
 
 @Composable
 fun HomeScreen(navController: NavHostController, userId:Int) {
-    loadEventData(LocalContext.current)
     var searchText by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<EventCategory?>(null) }
     val user = remember {
@@ -213,7 +214,6 @@ fun EventItem(event: Event, navController: NavHostController, userId: Int) {
                     imageVector = if (isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "Bookmark",
                     tint = MaterialTheme.colors.secondaryVariant
-                    //tint = Color(0xFFFF4500)
                 )
             }
         }

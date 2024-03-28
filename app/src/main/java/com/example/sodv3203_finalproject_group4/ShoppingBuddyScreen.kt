@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
@@ -23,9 +26,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,22 +43,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sodv3203_finalproject_group4.ui.EventViewModel
-import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import com.example.sodv3203_finalproject_group4.ui.BookmarkScreen
+import com.example.sodv3203_finalproject_group4.ui.EventScreen
+import com.example.sodv3203_finalproject_group4.ui.EventViewModel
 import com.example.sodv3203_finalproject_group4.ui.HistoryScreen
 import com.example.sodv3203_finalproject_group4.ui.HomeScreen
 import com.example.sodv3203_finalproject_group4.ui.NewEventScreen
-import com.example.sodv3203_finalproject_group4.ui.EventScreen
 import com.example.sodv3203_finalproject_group4.ui.ProfileScreen
 import com.example.sodv3203_finalproject_group4.ui.SignInScreen
 import com.example.sodv3203_finalproject_group4.ui.SignUpScreen
+import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 
 enum class ShoppingBuddyScreen(@StringRes val title: Int) {
@@ -121,7 +122,6 @@ fun MyBottomNavigationBar(
     ) {
         BottomNavigationItem(
             selected = selectedTab == ShoppingBuddyScreen.Home,
-            //onClick = { onTabSelected(ShoppingBuddyScreen.Home) },
             onClick = {
                 UserSessionManager.getCurrentUserId()?.let { userId ->
                     navController.navigate("home/$userId")
@@ -134,7 +134,6 @@ fun MyBottomNavigationBar(
         BottomNavigationItem(
             selected = selectedTab == ShoppingBuddyScreen.History,
             onClick = {
-                //onTabSelected(ShoppingBuddyScreen.History)
                 UserSessionManager.getCurrentUserId()?.let { userId ->
                     navController.navigate("${ShoppingBuddyScreen.History.name}/$userId")
                 } ?: run {
@@ -146,7 +145,6 @@ fun MyBottomNavigationBar(
         BottomNavigationItem(
             selected = selectedTab == ShoppingBuddyScreen.Bookmark,
             onClick = {
-                //onTabSelected(ShoppingBuddyScreen.Bookmark)
                 UserSessionManager.getCurrentUserId()?.let { userId ->
                     navController.navigate("${ShoppingBuddyScreen.Bookmark.name}/$userId")
                 } ?: run {
@@ -158,7 +156,6 @@ fun MyBottomNavigationBar(
         BottomNavigationItem(
             selected = selectedTab == ShoppingBuddyScreen.Profile,
             onClick = {
-                //onTabSelected(ShoppingBuddyScreen.Profile)
                 UserSessionManager.getCurrentUserId()?.let { userId ->
                     navController.navigate("${ShoppingBuddyScreen.Profile.name}/$userId")
                 } ?: run {
@@ -185,28 +182,28 @@ fun getShoppingBuddyScreenByRoute(route: String?): ShoppingBuddyScreen {
     return try {
         if (route != null) ShoppingBuddyScreen.valueOf(route) else ShoppingBuddyScreen.Home
     } catch (e: IllegalArgumentException) {
-        // Log the error or handle it as deemed appropriate
-        ShoppingBuddyScreen.Home // Default to Home if the route is not recognized
+        ShoppingBuddyScreen.Home
     }
 }
 @Composable
 fun ShoppingBuddyApp(
-    viewModel: EventViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+    // Initialize EventViewModel
+    val context = LocalContext.current
+    val eventViewModel: EventViewModel = EventViewModel(context)
+
+    // Collect the event UI state using State hoisting
+    val eventUiState by eventViewModel.eventUiState.collectAsState()
+
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = getShoppingBuddyScreenByRoute(
         backStackEntry?.destination?.route)
-    /*val currentScreen = ShoppingBuddyScreen.valueOf(
-        backStackEntry?.destination?.route ?: ShoppingBuddyScreen.Home.name
-    )*/
-    //val (selectedMenuItem, setSelectedMenuItem) = remember { mutableStateOf(0) }
 
     Scaffold(
         topBar = {
             ShoppingBuddyAppBar(
                 currentScreen = currentScreen,
-                //canNavigateBack = navController.previousBackStackEntry != null,
                 canNavigateBack = false,
                 navigateUp = { navController.navigateUp() }
             )
@@ -224,70 +221,69 @@ fun ShoppingBuddyApp(
         },
         containerColor = MaterialTheme.colorScheme.onSecondary
     ) { innerPadding ->
-        //val uiState by viewModel.uiState.collectAsState()
 
-        NavHost(
-            navController = navController,
-            //startDestination = ShoppingBuddyScreen.Home.name,
-            startDestination = "signIn",
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(route = "signIn") {
-                SignInScreen(navController = navController)
-            }
-            /*composable(route = ShoppingBuddyScreen.Home.name) {
-                // val context = LocalContext.current
-                HomeScreen(navController = navController)
-            }*/
+        // Display loading indicator if data is being fetched
+        if (eventUiState.isLoading) {
+            CircularProgressIndicator()
+        } else {
+            // Display events or error message based on the UI state
+            if (eventUiState.error != null) {
+                Text(text = eventUiState.error!!)
+            } else {
+                // Display the app content
+                NavHost(
+                    navController = navController,
+                    startDestination = "signIn",
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    composable(route = "signIn") {
+                        SignInScreen(navController = navController)
+                    }
 
-            composable("signUp") {
-                SignUpScreen(navController = navController)
-            }
-            composable(route = "home/{userId}") { backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId")
-                userId?.let {
-                    HomeScreen(navController = navController, userId = it.toInt())
+                    composable("signUp") {
+                        SignUpScreen(navController = navController)
+                    }
+
+                    composable(route = "home/{userId}") { backStackEntry ->
+                        val userId = backStackEntry.arguments?.getString("userId")
+                        userId?.let {
+                            HomeScreen(navController = navController, userId = it.toInt())
+                        }
+                    }
+
+                    composable(route = "NewEvent/{userId}"){backStackEntry ->
+                        backStackEntry.arguments?.getString("userId")?.toIntOrNull()?.let { userId -> NewEventScreen(navController = navController, userId = userId) }
+
+                    }
+
+                    composable(route = "NewEvent/{userId}/{eventId}"){backStackEntry ->
+                        val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
+                        val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: throw IllegalArgumentException("Event ID not found")
+                        NewEventScreen(userId = userId, navController = navController, eventId = eventId)
+                    }
+
+                    composable("eventScreen/{userId}/{eventId}") { backStackEntry ->
+                        val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
+                        val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: throw IllegalArgumentException("Event ID not found")
+                        EventScreen(userId = userId, navController = navController, eventId = eventId,)
+                    }
+
+                    composable(route = "${ShoppingBuddyScreen.History.name}/{userId}") {backStackEntry ->
+                        val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
+                        HistoryScreen(navController, userId)
+                    }
+
+                    composable(route = "${ShoppingBuddyScreen.Bookmark.name}/{userId}") {backStackEntry ->
+                        val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
+                        BookmarkScreen(navController, userId)
+                    }
+
+                    composable(route = "${ShoppingBuddyScreen.Profile.name}/{userId}") {backStackEntry ->
+                        val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
+                        ProfileScreen(navController, userId)
+                    }
                 }
             }
-
-            /*composable(route = ShoppingBuddyScreen.NewEvent.name) {
-                NewEventScreen()
-            }*/
-            composable(route = "NewEvent/{userId}"){backStackEntry ->
-                backStackEntry.arguments?.getString("userId")?.toIntOrNull()?.let { userId -> NewEventScreen(navController = navController, userId = userId) }
-
-            }
-
-            composable(route = "NewEvent/{userId}/{eventId}"){backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
-                val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: throw IllegalArgumentException("Event ID not found")
-                NewEventScreen(userId = userId, navController = navController, eventId = eventId)
-            }
-
-            /*composable(route = ShoppingBuddyScreen.Event.name) {
-                EventScreen()
-            }*/
-            composable("eventScreen/{userId}/{eventId}") { backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
-                val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: throw IllegalArgumentException("Event ID not found")
-                EventScreen(userId = userId, navController = navController, eventId = eventId,)
-            }
-
-            composable(route = "${ShoppingBuddyScreen.History.name}/{userId}") {backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
-                HistoryScreen(navController, userId)
-            }
-
-            composable(route = "${ShoppingBuddyScreen.Bookmark.name}/{userId}") {backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
-                BookmarkScreen(navController, userId)
-            }
-
-            composable(route = "${ShoppingBuddyScreen.Profile.name}/{userId}") {backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
-                ProfileScreen(navController, userId)
-            }
-
         }
     }
 }

@@ -2,7 +2,6 @@ package com.example.sodv3203_finalproject_group4.data
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventCategory
@@ -12,7 +11,6 @@ import com.example.sodv3203_finalproject_group4.users
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 
 
@@ -136,17 +134,13 @@ object UserSessionManager {
 
     fun login(userId: Int) {
         this.userId = userId
-        // You might also perform additional tasks here, such as storing the user ID in SharedPreferences
     }
 
     fun logout() {
         userId = null
-        // You might also perform additional tasks here, such as clearing the user ID from SharedPreferences
     }
 
     fun getUserId(): Int? {
         return userId
     }
-
-    // You can add more methods as needed, such as checking if a user is logged in, etc.
 }
