@@ -21,8 +21,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import com.example.sodv3203_finalproject_group4.data.UserSessionManager
 import com.example.sodv3203_finalproject_group4.users
+import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 
 @Composable
 fun SignUpScreen(navController: NavController) {
@@ -138,10 +138,9 @@ fun SignUpScreen(navController: NavController) {
                     confirmButton = {
                         Button(
                             onClick = {
-                                // Navigate to SignIn Page
-                                // userToShow?.let { navController.navigate("home/${it.userId}") }
                                 showProfileCreatedDialog = false
-                                navController.navigate("signIn")
+                                // navController.navigate("signIn")
+                                userToShow?.let { navController.navigate("home/${it.userId}") }
                             }
                         ) {
                             Text(text = "OK")

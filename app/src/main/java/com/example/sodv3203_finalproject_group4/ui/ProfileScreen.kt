@@ -1,22 +1,38 @@
 package com.example.sodv3203_finalproject_group4.ui
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sodv3203_finalproject_group4.R
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sodv3203_finalproject_group4.R
 import com.example.sodv3203_finalproject_group4.data.EventDataSource
 import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
@@ -26,11 +42,9 @@ import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 @Composable
 fun ProfileScreen(navController: NavController, userId:Int) {
     var users = users.toMutableList()
-    val user = users.find { it.userId == userId } ?: User(-1, "", "", "", "", "") // Default user if not found
-    //var user = Datasource.getUser(userId)
+    val user = users.find { it.userId == userId } ?: User(-1, "", "", "", "", "")
     var displayName by remember { mutableStateOf(user.displayName) }
     var name by remember { mutableStateOf(user.name) }
-    //var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf(user.email) }
     var phoneNo  by remember { mutableStateOf(user.phoneNo) }
     var password by remember{ mutableStateOf(user.password) }
@@ -38,11 +52,6 @@ fun ProfileScreen(navController: NavController, userId:Int) {
     var showDialog by remember { mutableStateOf(false) }
 
 
-    /*
-    Surface(
-        color = MaterialTheme.colors.background,
-        modifier = Modifier.fillMaxSize()
-    ) {*/
     Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -52,7 +61,6 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                 text = user.displayName,
                 style = MaterialTheme.typography.h5,
                 modifier = Modifier.padding(bottom = 16.dp)
-                //color = MaterialTheme.colors.background
             )
 
             // Group 4 and Email (Centered)
@@ -65,7 +73,6 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                 Text(
                     text = user.email,
                     style = MaterialTheme.typography.body1
-                    //color = MaterialTheme.colors.background
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -74,14 +81,13 @@ fun ProfileScreen(navController: NavController, userId:Int) {
             Divider(
                 thickness = 1.dp,
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                //color = MaterialTheme.colors.background
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             // Edit Profile
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start // Aligns children horizontally to the start (left)
+                horizontalArrangement = Arrangement.Start
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.profileicon),
@@ -91,8 +97,7 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Edit Profile",
-                    style = MaterialTheme.typography.button,
-                    //color = MaterialTheme.colors.background
+                    style = MaterialTheme.typography.button
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -179,7 +184,7 @@ fun ProfileScreen(navController: NavController, userId:Int) {
                 onClick = {
                     UserSessionManager.logout()
                     navController.navigate("signIn") {
-                        popUpTo("signIn") { inclusive = true } // Replace "signIn" with your actual start destination ID
+                        popUpTo("signIn") { inclusive = true }
                         launchSingleTop = true
                     }
                 },

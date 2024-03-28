@@ -2,16 +2,15 @@ package com.example.sodv3203_finalproject_group4.data
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventCategory
+import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.users
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 
 
@@ -40,12 +39,27 @@ object EventDataSource {
         }
     }
 
+    fun updateEventStatus(eventId: Int, newStatus: EventStatus) {
+        // Find the event by its ID
+        val eventToUpdate = events.find { it.eventId == eventId }
+        // Update the status if the event is found
+        eventToUpdate?.let {
+            it.status = newStatus
+        }
+    }
+
     fun loadEvents(context: Context): List<Event> {
         val jsonString = loadJsonFromAsset(context, EVENTS_JSON_FILENAME)
         val eventType = object : TypeToken<List<Event>>() {}.type
         val events = Gson().fromJson<List<Event>>(jsonString, eventType)
         //return Gson().fromJson(jsonString, eventType)
         return events.map { it.copy(imageName = context.resources.getIdentifier(it.imageName, "drawable", context.packageName).toString()) }
+    }
+
+    fun isEventOwner(userId: Int, eventId: Int): Boolean {
+        val event = events.firstOrNull { it.eventId == eventId }
+        val eventOwnerId = event?.eventBy?.toIntOrNull()
+        return eventOwnerId == userId
     }
 
     fun loadCategories(context: Context): List<EventCategory> {
@@ -113,24 +127,4 @@ object EventDataSource {
         file.writeText(json)
         Log.d("EventDataSource", "Saved to path: ${file.absolutePath}")
     }
-}
-
-object UserSessionManager {
-    private var userId: Int? = null
-
-    fun login(userId: Int) {
-        this.userId = userId
-        // You might also perform additional tasks here, such as storing the user ID in SharedPreferences
-    }
-
-    fun logout() {
-        userId = null
-        // You might also perform additional tasks here, such as clearing the user ID from SharedPreferences
-    }
-
-    fun getUserId(): Int? {
-        return userId
-    }
-
-    // You can add more methods as needed, such as checking if a user is logged in, etc.
 }

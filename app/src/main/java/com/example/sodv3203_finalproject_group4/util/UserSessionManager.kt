@@ -14,4 +14,8 @@ object UserSessionManager {
     fun getCurrentUserId(): Int? = userId
 
     fun isUserLoggedIn(): Boolean = userId != null
+
+    fun getUserId(): Int? {
+        return userId
+    }
 }

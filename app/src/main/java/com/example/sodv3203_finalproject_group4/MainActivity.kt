@@ -9,7 +9,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,13 +18,11 @@ import com.example.sodv3203_finalproject_group4.model.EventCategory
 import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 
-// Define the global variables at the top-level of your file or in an object
 lateinit var events: MutableList<Event>
 lateinit var categories: List<EventCategory>
 lateinit var users: MutableList<User>
 lateinit var categoryMap: Map<Int, String>
 
-// Load events, categories, and users when your application starts, for example, in your Application class or the entry point of your app.
 fun loadEventData(context: Context) {
     events = EventDataSource.loadEvents(context).toMutableList()
     categories = EventDataSource.loadCategories(context)
