@@ -116,7 +116,7 @@ fun HistoryListItem(event: Event, navController: NavHostController, userId:Int) 
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
                     Text(
-                        text = "$${event.price} ($${ceil(event.price/event.currHeadCount)} per Share)",
+                        text = "$${event.price} ($${String.format("%.1f", event.price / event.currHeadCount)} per share)",
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
                 }
