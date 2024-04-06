@@ -1,6 +1,7 @@
 package com.example.sodv3203_finalproject_group4.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -8,55 +9,54 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.sodv3203_finalproject_group4.R
-import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import java.util.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Text
-import androidx.compose.runtime.MutableState
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import coil.compose.rememberImagePainter
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import com.example.sodv3203_finalproject_group4.model.Event
-import com.example.sodv3203_finalproject_group4.model.EventCategory
-import com.example.sodv3203_finalproject_group4.model.EventStatus
-import java.text.SimpleDateFormat
-import kotlin.math.ceil
-import android.util.Log
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.sodv3203_finalproject_group4.LoadImage
+import coil.compose.rememberImagePainter
+import com.example.sodv3203_finalproject_group4.R
 import com.example.sodv3203_finalproject_group4.categories
 import com.example.sodv3203_finalproject_group4.categoryMap
 import com.example.sodv3203_finalproject_group4.data.EventDataSource
 import com.example.sodv3203_finalproject_group4.events
-import androidx.compose.ui.text.TextStyle
+import com.example.sodv3203_finalproject_group4.model.Event
+import com.example.sodv3203_finalproject_group4.model.EventCategory
+import com.example.sodv3203_finalproject_group4.model.EventStatus
+import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import com.example.sodv3203_finalproject_group4.users
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.math.ceil
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int = -1) {
+fun NewEventScreen(
+    navController: NavHostController,
+    viewModel: EventViewModel,
+    userId: Int, eventId: Int = -1
+) {
 
     val fromEvent = remember {
         events.find { it.eventId == eventId }
@@ -267,7 +267,9 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
         item {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             ) {
                 // Calendar icon
                 Image(
@@ -338,6 +340,7 @@ fun NewEventScreen(navController: NavHostController, userId: Int, eventId: Int =
                 price = price,
                 userId = userId,
                 fromEvent = fromEvent,
+                viewModel = viewModel,
                 onEventCreated = { showDialog = true }
             )
             // Show dialog if showDialog is true
@@ -715,6 +718,7 @@ fun CreateButton(
     price: Double,
     userId: Int,
     fromEvent: Event?,
+    viewModel: EventViewModel,
     onEventCreated: () -> Unit
 ) {
     // Format the dates to YYYYMMDD format
@@ -722,6 +726,8 @@ fun CreateButton(
     val formattedFirstDate = dateFormat.format(firstSelectedDate)
     val formattedSecondDate = dateFormat.format(secondSelectedDate)
     var showDialog by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Button(onClick = {
 
@@ -747,9 +753,12 @@ fun CreateButton(
 
             // Add the new event to the datasource
             EventDataSource.addEvent(newEvent)
+            coroutineScope.launch {
+                viewModel.addEvent(newEvent)
 
-            // Call the callback function to notify that event is created
-            onEventCreated()
+                // Call the callback function to notify that event is created
+                onEventCreated()
+            }
         } else {
             // Log a message or show an error indicating that required fields are missing
             showDialog = true
@@ -772,7 +781,7 @@ fun CreateButton(
 fun NewEventScreenPreview() {
     val navController = rememberNavController()
     ShoppingBuddyAppTheme {
-        NewEventScreen(navController = navController, userId = 2, eventId = -1)
+        NewEventScreen(navController = navController, viewModel = viewModel() , userId = 2, eventId = -1)
     }
 }
 

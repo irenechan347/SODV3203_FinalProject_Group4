@@ -1,3 +1,5 @@
+package com.example.sodv3203_finalproject_group4.data
+
 import com.example.sodv3203_finalproject_group4.model.Event
 
 data class EventUiState(

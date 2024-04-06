@@ -1,5 +1,7 @@
 package com.example.sodv3203_finalproject_group4.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.util.Date
 
 enum class EventStatus() {
@@ -10,8 +12,10 @@ enum class EventStatus() {
     Cancelled
 }
 
+@Entity(tableName = "events")
 data class Event(
-    var eventId: Int,
+    @PrimaryKey(autoGenerate = true)
+    var eventId: Int = 0,
     var userId: Int,
     var categoryId: Int,
     var productName: String,

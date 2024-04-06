@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", ""+applicationContext)
         loadEventData(applicationContext)
+
         setContent {
             val isSystemInDarkMode = isSystemInDarkTheme()
             ShoppingBuddyAppTheme {

@@ -1,5 +1,6 @@
 package com.example.sodv3203_finalproject_group4
 
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -38,11 +39,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.sodv3203_finalproject_group4.ui.AppViewModelProvider
 import com.example.sodv3203_finalproject_group4.ui.BookmarkScreen
 import com.example.sodv3203_finalproject_group4.ui.EventScreen
 import com.example.sodv3203_finalproject_group4.ui.EventViewModel
@@ -185,13 +188,15 @@ fun getShoppingBuddyScreenByRoute(route: String?): ShoppingBuddyScreen {
         ShoppingBuddyScreen.Home
     }
 }
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ShoppingBuddyApp(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    eventViewModel: EventViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     // Initialize EventViewModel
     val context = LocalContext.current
-    val eventViewModel: EventViewModel = EventViewModel(context)
+    //val eventViewModel: EventViewModel = EventViewModel(context)
 
     // Collect the event UI state using State hoisting
     val eventUiState by eventViewModel.eventUiState.collectAsState()
@@ -199,6 +204,13 @@ fun ShoppingBuddyApp(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = getShoppingBuddyScreenByRoute(
         backStackEntry?.destination?.route)
+
+    /*
+    val coroutineScope = rememberCoroutineScope()
+    coroutineScope.launch {
+        eventViewModel.addAllEventCategories(categories)
+    }
+    */
 
     Scaffold(
         topBar = {
@@ -237,7 +249,7 @@ fun ShoppingBuddyApp(
                     modifier = Modifier.padding(innerPadding)
                 ) {
                     composable(route = "signIn") {
-                        SignInScreen(navController = navController)
+                        SignInScreen(navController = navController, viewModel = eventViewModel)
                     }
 
                     composable("signUp") {
@@ -252,14 +264,14 @@ fun ShoppingBuddyApp(
                     }
 
                     composable(route = "NewEvent/{userId}"){backStackEntry ->
-                        backStackEntry.arguments?.getString("userId")?.toIntOrNull()?.let { userId -> NewEventScreen(navController = navController, userId = userId) }
+                        backStackEntry.arguments?.getString("userId")?.toIntOrNull()?.let { userId -> NewEventScreen(navController = navController, viewModel = eventViewModel, userId = userId) }
 
                     }
 
                     composable(route = "NewEvent/{userId}/{eventId}"){backStackEntry ->
                         val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
                         val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: throw IllegalArgumentException("Event ID not found")
-                        NewEventScreen(userId = userId, navController = navController, eventId = eventId)
+                        NewEventScreen(userId = userId, navController = navController, viewModel = eventViewModel, eventId = eventId)
                     }
 
                     composable("eventScreen/{userId}/{eventId}") { backStackEntry ->
