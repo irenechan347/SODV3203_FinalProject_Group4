@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,25 +47,25 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.LoadImage
-import com.example.sodv3203_finalproject_group4.categories
-import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventCategory
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import com.example.sodv3203_finalproject_group4.users
 
 @Composable
-fun HomeScreen(navController: NavHostController, userId:Int) {
+fun HomeScreen(navController: NavHostController, userId:Int, viewModel: EventViewModel) {
+    val events by viewModel.getAllEvents().collectAsState(initial = emptyList())
+    val eventCategories by viewModel.getAllEventCategories().collectAsState(initial = emptyList())
     var searchText by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<EventCategory?>(null) }
     var sortByDate by remember { mutableStateOf(false) }
-    val user = remember {
+    /*val user = remember {
         users.find { it.userId == userId }
-    }
+    }*/
     val filteredEvents = events.filter { event ->
         event.status == EventStatus.Available &&
                 event.productName.contains(searchText, ignoreCase = true) &&
@@ -142,7 +143,7 @@ fun HomeScreen(navController: NavHostController, userId:Int) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            items(categories) { category ->
+            items(eventCategories) { category ->
                 Button(
                     onClick = { selectedCategory = if (selectedCategory == category) null else category },
                     modifier = Modifier.padding(end = 8.dp),
@@ -259,6 +260,6 @@ fun EventItem(event: Event, navController: NavHostController, userId: Int) {
 fun HomeScreenPreview() {
     ShoppingBuddyAppTheme {
         val navController = rememberNavController()
-        HomeScreen(navController = navController, userId = 2)
+        HomeScreen(navController = navController, userId = 2, viewModel = viewModel() )
     }
 }

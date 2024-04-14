@@ -259,7 +259,7 @@ fun ShoppingBuddyApp(
                     composable(route = "home/{userId}") { backStackEntry ->
                         val userId = backStackEntry.arguments?.getString("userId")
                         userId?.let {
-                            HomeScreen(navController = navController, userId = it.toInt())
+                            HomeScreen(navController = navController, userId = it.toInt(),viewModel = eventViewModel)
                         }
                     }
 

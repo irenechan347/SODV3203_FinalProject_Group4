@@ -24,8 +24,12 @@ class EventViewModel(
         shoppingBuddyRepository.insertEvent(event)
     }
 
-    suspend fun getAllEventCategories(): Flow<List<EventCategory>> {
+    fun getAllEventCategories(): Flow<List<EventCategory>> {
         return shoppingBuddyRepository.getAllEventCategories()
+    }
+
+    fun getAllEvents(): Flow<List<Event>> {
+        return shoppingBuddyRepository.getAllEvents()
     }
 
     suspend fun addAllEvents(events: MutableList<Event>) {
