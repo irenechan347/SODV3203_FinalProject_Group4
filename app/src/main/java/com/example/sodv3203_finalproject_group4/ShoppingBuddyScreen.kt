@@ -253,7 +253,7 @@ fun ShoppingBuddyApp(
                     }
 
                     composable("signUp") {
-                        SignUpScreen(navController = navController)
+                        SignUpScreen(navController = navController,viewModel = eventViewModel)
                     }
 
                     composable(route = "home/{userId}") { backStackEntry ->

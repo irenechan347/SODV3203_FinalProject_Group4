@@ -23,7 +23,7 @@ class OfflineShoppingBuddyRepository(
     override fun getAllUsers(): Flow<List<User>> = userDao.getAllUsers()
     override fun getUserById(id: Int): Flow<User?> = userDao.getUserById(id)
     override fun getUserByEmail(email: String): Flow<User?> = userDao.getUserByEmail(email)
-    override suspend fun insertUser(user: User) = userDao.insert(user)
+    override suspend fun insertUser(user: User): Long = userDao.insert(user)
     override suspend fun deleteUser(user: User) = userDao.delete(user)
     override suspend fun updateUser(user: User) = userDao.update(user)
 }

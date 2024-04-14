@@ -19,7 +19,7 @@ interface ShoppingBuddyRepository {
     fun getAllUsers(): Flow<List<User>>
     fun getUserById(id: Int): Flow<User?>
     fun getUserByEmail(email: String): Flow<User?>
-    suspend fun insertUser(user: User)
+    suspend fun insertUser(user: User): Long
     suspend fun deleteUser(user: User)
     suspend fun updateUser(user: User)
 }

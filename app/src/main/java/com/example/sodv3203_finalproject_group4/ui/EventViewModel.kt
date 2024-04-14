@@ -53,6 +53,11 @@ class EventViewModel(
         return shoppingBuddyRepository.getUserByEmail(email)
     }
 
+    suspend fun insertUser(user: User): Long {
+        return shoppingBuddyRepository.insertUser(user)
+    }
+
+
     /*
     fun fetchEvents() {
         _eventUiState.value = EventUiState(isLoading = true)

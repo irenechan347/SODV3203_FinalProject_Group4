@@ -1,31 +1,43 @@
 package com.example.sodv3203_finalproject_group4.ui
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.R
-import com.example.sodv3203_finalproject_group4.data.EventDataSource
 import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
 import com.example.sodv3203_finalproject_group4.users
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
+import kotlinx.coroutines.launch
 
 @Composable
-fun SignUpScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController, viewModel: EventViewModel) {
     var displayName by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -34,6 +46,8 @@ fun SignUpScreen(navController: NavController) {
     var showProfileCreatedDialog by remember { mutableStateOf(false) }
     var showEmailExistDialog by remember { mutableStateOf(false) }
     var userCreatedSuccessfully by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.padding(16.dp)) {
 
@@ -93,27 +107,29 @@ fun SignUpScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-
-                    val isEmailExists = users.any { it.email == email }
-                    if (isEmailExists) {
-                        // Show AlertDialog if the email already exists
-                        showEmailExistDialog = true
-                        return@Button
+                    coroutineScope.launch {
+                        try {
+                            val newUser = User(
+                                displayName = displayName,
+                                name = name,
+                                email = email,
+                                phoneNo = phoneNo,
+                                password = password
+                            )
+                            val userId = viewModel.insertUser(newUser)
+                            if (userId != -1L) {
+                                UserSessionManager.login(userId.toInt())
+                                showProfileCreatedDialog = true// Convert Long to Int if needed
+                                //navController.navigate("home/${userId.toInt()}") // Convert Long to Int for navigation
+                            } else {
+                                // Handle the case where user insertion failed due to conflict
+                                showEmailExistDialog = true
+                            }
+                        } catch (e: Exception) {
+                            // Handle the case where user insertion failed due to email conflict
+                            showEmailExistDialog = true
+                        }
                     }
-
-                    userCreatedSuccessfully = true
-                    val largestUserId = users.maxOfOrNull { it.userId } ?: 0
-                    val newUser = User(
-                        userId = largestUserId + 1,
-                        displayName = displayName,
-                        name = name,
-                        email = email,
-                        phoneNo = phoneNo,
-                        password = password
-                    )
-                    EventDataSource.addUser(newUser) // Add the user to the data source
-                    UserSessionManager.login(newUser.userId)
-                    showProfileCreatedDialog = true
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
@@ -174,6 +190,6 @@ fun SignUpScreen(navController: NavController) {
 @Composable
 fun SignUpScreenPreview() {
     ShoppingBuddyAppTheme {
-        SignUpScreen(navController = rememberNavController())
+        SignUpScreen(navController = rememberNavController(), viewModel = viewModel())
     }
 }
