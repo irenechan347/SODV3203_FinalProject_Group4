@@ -34,6 +34,7 @@ import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 import com.example.sodv3203_finalproject_group4.users
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 @Composable
@@ -118,9 +119,7 @@ fun SignUpScreen(navController: NavController, viewModel: EventViewModel) {
                             )
                             val userId = viewModel.insertUser(newUser)
                             if (userId != -1L) {
-                                UserSessionManager.login(userId.toInt())
-                                showProfileCreatedDialog = true// Convert Long to Int if needed
-                                //navController.navigate("home/${userId.toInt()}") // Convert Long to Int for navigation
+                                showProfileCreatedDialog = true
                             } else {
                                 // Handle the case where user insertion failed due to conflict
                                 showEmailExistDialog = true
@@ -155,8 +154,17 @@ fun SignUpScreen(navController: NavController, viewModel: EventViewModel) {
                         Button(
                             onClick = {
                                 showProfileCreatedDialog = false
-                                // navController.navigate("signIn")
-                                userToShow?.let { navController.navigate("home/${it.userId}") }
+                                coroutineScope.launch {
+                                    // Call getUserByEmail within a coroutine
+                                    val user = viewModel.getUserByEmail(email).firstOrNull()
+                                    val userId = user?.userId ?: -1
+                                    if (userId != -1) {
+                                        UserSessionManager.login(userId)
+                                        navController.navigate("home/$userId")
+                                    } else {
+                                        // Handle error case where userId is not found
+                                    }
+                                }
                             }
                         ) {
                             Text(text = "OK")
