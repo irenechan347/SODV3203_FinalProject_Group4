@@ -45,8 +45,8 @@ class EventViewModel(
         users.forEach { shoppingBuddyRepository.insertUser(it) }
     }
 
-    suspend fun getUserById(id: Int): Flow<User?> {
-        return shoppingBuddyRepository.getUserById(id)
+    suspend fun getUserById(userid: Int): Flow<User?> {
+        return shoppingBuddyRepository.getUserById(userid)
     }
 
     suspend fun getUserByEmail(email: String): Flow<User?> {
@@ -82,4 +82,28 @@ class EventViewModel(
         _eventUiState.value = updatedUiState
     }
     */
+    suspend fun updateUserProfile(user: User) {
+        shoppingBuddyRepository.updateUser(user)
+    }
+
+    suspend fun updateUser(
+        userId: Int,
+        displayName: String,
+        name: String,
+        email: String,
+        phoneNo: String,
+        password: String
+    ) {
+        val user = User(
+            userId = userId,
+            displayName = displayName,
+            name = name,
+            email = email,
+            phoneNo = phoneNo,
+            password = password
+        )
+        shoppingBuddyRepository.updateUser(user)
+    }
 }
+
+

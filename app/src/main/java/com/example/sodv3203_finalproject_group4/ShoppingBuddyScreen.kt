@@ -292,7 +292,7 @@ fun ShoppingBuddyApp(
 
                     composable(route = "${ShoppingBuddyScreen.Profile.name}/{userId}") {backStackEntry ->
                         val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: throw IllegalArgumentException("User ID not found")
-                        ProfileScreen(navController, userId)
+                        ProfileScreen(navController = navController, viewModel = eventViewModel, userId = userId)
                     }
                 }
             }
