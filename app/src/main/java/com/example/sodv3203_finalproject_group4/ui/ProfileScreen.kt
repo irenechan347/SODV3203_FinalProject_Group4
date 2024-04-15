@@ -1,27 +1,21 @@
 package com.example.sodv3203_finalproject_group4.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +31,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import com.example.sodv3203_finalproject_group4.users
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 import kotlinx.coroutines.launch
 
@@ -47,16 +40,36 @@ fun ProfileScreen(
     viewModel: EventViewModel,
     userId: Int
 ) {
-    var users = users.toMutableList()
+    /*var users = users.toMutableList()
     val user = users.find { it.userId == userId } ?: User(-1, "", "", "", "", "")
     var displayName by remember { mutableStateOf(user.displayName) }
     var name by remember { mutableStateOf(user.name) }
     var email by remember { mutableStateOf(user.email) }
     var phoneNo by remember { mutableStateOf(user.phoneNo) }
     var password by remember { mutableStateOf(user.password) }
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }*/
 
+
+    var user by remember { mutableStateOf<User?>(null) }
+    var displayName by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var phoneNo by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = userId) {
+        viewModel.getUserById(userId).collect { fetchedUser ->
+            user = fetchedUser
+            displayName = fetchedUser?.displayName ?: ""
+            name = fetchedUser?.name ?: ""
+            email = fetchedUser?.email ?: ""
+            phoneNo = fetchedUser?.phoneNo ?: ""
+            password = fetchedUser?.password ?: ""
+        }
+    }
+
 
             Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column(
@@ -64,14 +77,14 @@ fun ProfileScreen(
             ) {
                 // Display user's display name
                 Text(
-                    text = "${user.displayName}",
+                    text = "${user?.displayName}",
                     style = MaterialTheme.typography.h5,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
                 // Email
                 Text(
-                    text = "${user.email}",
+                    text = "${user?.email}",
                     style = MaterialTheme.typography.body1
                 )
                 Spacer(modifier = Modifier.height(16.dp))
