@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -36,15 +37,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.example.sodv3203_finalproject_group4.R
-import com.example.sodv3203_finalproject_group4.categories
-import com.example.sodv3203_finalproject_group4.categoryMap
-import com.example.sodv3203_finalproject_group4.data.EventDataSource
-import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventCategory
 import com.example.sodv3203_finalproject_group4.model.EventStatus
+import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import com.example.sodv3203_finalproject_group4.users
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -57,10 +54,13 @@ fun NewEventScreen(
     viewModel: EventViewModel,
     userId: Int, eventId: Int = -1
 ) {
+    val events by viewModel.getAllEvents().collectAsState(initial = emptyList())
+    val categories by viewModel.getAllEventCategories().collectAsState(initial = emptyList())
+    val categoryMap = categories.associate { it.categoryId to it.categoryName }
+    val users by viewModel.getAllUsers().collectAsState(initial = emptyList())
 
-    val fromEvent = remember {
-        events.find { it.eventId == eventId }
-    }
+    val fromEvent = events.find { it.eventId == eventId }
+    //val fromEvent = events.firstOrNull() { event -> event.eventId == eventId }
 
     // Find the maximum event ID from the existing event list
     val maxEventId = events.maxOfOrNull { it.eventId } ?: 0
@@ -86,8 +86,8 @@ fun NewEventScreen(
     var price by remember { mutableDoubleStateOf(fromEvent?.price ?: 0.0) }
 
     // Calculate price per share based on the input values
-    var pricePerShare by remember { mutableDoubleStateOf(0.0) }
-    pricePerShare = price / numberOfPeople
+    var pricePerShare by remember { mutableDoubleStateOf( if(numberOfPeople>0) (price / numberOfPeople) else 0.0) }
+    //pricePerShare = price / numberOfPeople
 
 // Define a variable to hold the selected category ID
     var selectedCategoryId by remember { mutableStateOf<Int?>(fromEvent?.categoryId ?: null) }
@@ -179,7 +179,8 @@ fun NewEventScreen(
                     onCategorySelected = onCategorySelected,
                     fromEvent = fromEvent,
                     selectedCategoryId = fromEvent.categoryId,
-                    categoryMap = categoryMap
+                    categoryMap = categoryMap,
+                    categories = categories
                 )
             } else {
                 CategoryRow(
@@ -187,7 +188,8 @@ fun NewEventScreen(
                     onCategorySelected = onCategorySelected,
                     fromEvent = null, // Pass null for fromEvent when it is not available
                     selectedCategoryId = selectedCategoryId,
-                    categoryMap = categoryMap
+                    categoryMap = categoryMap,
+                    categories = categories
                 )
             }
         }
@@ -317,18 +319,46 @@ fun NewEventScreen(
 
         // 7. Row with Money icon and input box for price
         item {
-            PriceInputRow(
-                iconId = R.drawable.dollar,
-                hint = "Product Price",
-                initialPrice = fromEvent?.price ?: 0.0,
-                numberOfPeople = numberOfPeople,
-            ) { newValue ->
-                price = newValue
+            if (fromEvent != null) {
+                PriceInputRow(
+                    iconId = R.drawable.dollar,
+                    hint = "Product Price",
+                    initialPrice = fromEvent.price ?: 0.0,
+                    numberOfPeople = fromEvent.currHeadCount,
+                ) { newValue ->
+                    price = newValue
+                }
+            }
+            else {
+                PriceInputRow(
+                    iconId = R.drawable.dollar,
+                    hint = "Product Price",
+                    numberOfPeople = numberOfPeople,
+                ) { newValue ->
+                    price = newValue
+                }
             }
         }
 
         // 8. Create button
         item {
+            if(fromEvent != null){
+                if(selectedCategoryId == null) {
+                    selectedCategoryId = fromEvent.categoryId
+                }
+                if(productName.isBlank()) {
+                    productName = fromEvent.productName
+                }
+                if(location.isBlank()) {
+                    location = fromEvent.location
+                }
+                if(numberOfPeople <= 0) {
+                    numberOfPeople = fromEvent.currHeadCount
+                }
+                if(price <= 0) {
+                    price = fromEvent.price
+                }
+            }
             CreateButton(
                 newEventId = newEventId,
                 selectedCategoryId = selectedCategoryId,
@@ -350,7 +380,8 @@ fun NewEventScreen(
                     userId = userId,
                     onDismiss = {
                         showDialog = false
-                    }
+                    },
+                    users = users
                 )
             }
         }
@@ -358,7 +389,7 @@ fun NewEventScreen(
 }
 
 @Composable
-fun ShowDataSentDialog(navController: NavHostController, userId: Int, onDismiss: () -> Unit) {
+fun ShowDataSentDialog(navController: NavHostController, userId: Int, onDismiss: () -> Unit, users: List<User>) {
     val user = users.find { it.userId == userId } ?: return // Ensure user exists
     AlertDialog(
         onDismissRequest = {
@@ -402,7 +433,8 @@ fun CategoryRow(
     onCategorySelected: (EventCategory?) -> Unit,
     fromEvent: Event?,
     selectedCategoryId: Int?,
-    categoryMap: Map<Int, String>
+    categoryMap: Map<Int, String>,
+    categories: List<EventCategory>
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -457,7 +489,7 @@ fun CategoryRow(
             onDismissRequest = { expanded = false },
             modifier = Modifier.width(120.dp) // Adjust width as needed
         ) {
-            categories.forEach { category ->
+            categories?.forEach { category ->
                 DropdownMenuItem(onClick = {
                     onCategorySelected(category)
                     expanded = false
@@ -633,7 +665,7 @@ fun PriceInputRow(
     hint: String,
     initialPrice: Double = 0.0,
     numberOfPeople: Int, // Number of people input
-    onValueChange: (Double) -> Unit // Callback for price value change
+    onValueChange: (Double) -> Unit, // Callback for price value change
 ) {
     val initialPricePerShare = ceil(initialPrice / numberOfPeople * 10) / 10
 
@@ -752,7 +784,7 @@ fun CreateButton(
             )
 
             // Add the new event to the datasource
-            EventDataSource.addEvent(newEvent)
+            //EventDataSource.addEvent(newEvent)
             coroutineScope.launch {
                 viewModel.addEvent(newEvent)
 

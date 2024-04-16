@@ -16,6 +16,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +33,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.R
 import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import com.example.sodv3203_finalproject_group4.users
 import com.example.sodv3203_finalproject_group4.util.UserSessionManager
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -47,6 +47,7 @@ fun SignUpScreen(navController: NavController, viewModel: EventViewModel) {
     var showProfileCreatedDialog by remember { mutableStateOf(false) }
     var showEmailExistDialog by remember { mutableStateOf(false) }
     var userCreatedSuccessfully by remember { mutableStateOf(false) }
+    val users by viewModel.getAllUsers().collectAsState(initial = emptyList())
 
     val coroutineScope = rememberCoroutineScope()
 

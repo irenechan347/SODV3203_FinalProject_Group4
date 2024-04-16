@@ -27,9 +27,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,34 +41,50 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.LoadImage
-import com.example.sodv3203_finalproject_group4.categoryMap
-import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventStatus
+import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import com.example.sodv3203_finalproject_group4.users
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 @Composable
-fun BookmarkScreen(navController: NavHostController, userId:Int) {
-    val bookmarkedEventList = events.filter { it.isBookmark }
+fun BookmarkScreen(
+    navController: NavHostController,
+    userId:Int,
+    viewModel: EventViewModel
+) {
+    //val bookmarkedEventList = events.filter { it.isBookmark }
+    val events by viewModel.getAllEvents().collectAsState(initial = emptyList())
+    val bookmarkedEventList = events.filter { event -> event.isBookmark }
+    val categories by viewModel.getAllEventCategories().collectAsState(initial = emptyList())
+    val categoryMap = categories.associate { it.categoryId to it.categoryName }
+    val users by viewModel.getAllUsers().collectAsState(initial = emptyList())
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        BookmarkList(bookmarkedEventList, navController, userId)
+        BookmarkList(bookmarkedEventList, navController, userId, viewModel, users, categoryMap)
     }
 }
 
 @Composable
-fun BookmarkList(eventList: List<Event>, navController: NavHostController, userId:Int) {
+fun BookmarkList(
+    eventList: List<Event>,
+    navController: NavHostController,
+    userId:Int,
+    viewModel: EventViewModel,
+    users: List<User>,
+    categoryMap: Map<Int, String>
+) {
     LazyColumn {
         items(eventList) { event ->
-            BookmarkListItem(event = event, navController, userId)
+            BookmarkListItem(event = event, navController, userId, viewModel, users, categoryMap)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,9 +100,18 @@ fun BookmarkList(eventList: List<Event>, navController: NavHostController, userI
 }
 
 @Composable
-fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int) {
+fun BookmarkListItem(
+    event: Event,
+    navController: NavHostController,
+    userId:Int,
+    viewModel: EventViewModel,
+    users: List<User>,
+    categoryMap: Map<Int, String>
+) {
     val categoryName = categoryMap[event.categoryId]
     var isBookmarked by remember { mutableStateOf(event.isBookmark) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Row(
         modifier = Modifier
@@ -130,8 +157,12 @@ fun BookmarkListItem(event: Event, navController: NavHostController, userId:Int)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
-                        isBookmarked = !isBookmarked
-                        event.isBookmark = !event.isBookmark
+                        coroutineScope.launch {
+                            isBookmarked = !isBookmarked
+                            event.isBookmark = !event.isBookmark
+
+                            viewModel.updateEvent(event)
+                        }
                     }
                 ) {
                     Icon(
@@ -203,6 +234,6 @@ private fun ButtonColors(status: EventStatus): ButtonColors {
 fun BookmarkScreenPreview() {
     ShoppingBuddyAppTheme {
         val navController = rememberNavController()
-        BookmarkScreen(navController, 2)
+        BookmarkScreen(navController, 2, viewModel = viewModel())
     }
 }

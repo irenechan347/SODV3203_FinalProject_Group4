@@ -37,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +56,7 @@ import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventCategory
 import com.example.sodv3203_finalproject_group4.model.EventStatus
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(navController: NavHostController, userId:Int, viewModel: EventViewModel) {
@@ -186,15 +188,22 @@ fun HomeScreen(navController: NavHostController, userId:Int, viewModel: EventVie
         // Display filtered events
         LazyColumn(modifier = Modifier.padding(8.dp)) {
             items(sortedEvents) { event ->
-                EventItem(event = event, navController, userId)
+                EventItem(event = event, navController, userId, viewModel)
             }
         }
     }
 }
 
 @Composable
-fun EventItem(event: Event, navController: NavHostController, userId: Int) {
+fun EventItem(
+    event: Event,
+    navController: NavHostController,
+    userId: Int,
+    viewModel: EventViewModel
+) {
     var isBookmarked by remember { mutableStateOf(event.isBookmark) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Card(
         modifier = Modifier
@@ -241,8 +250,12 @@ fun EventItem(event: Event, navController: NavHostController, userId: Int) {
             Spacer(modifier = Modifier.width(16.dp))
             IconButton(
                 onClick = {
-                    isBookmarked = !isBookmarked
-                    event.isBookmark = !event.isBookmark
+                    coroutineScope.launch {
+                        isBookmarked = !isBookmarked
+                        event.isBookmark = !event.isBookmark
+
+                        viewModel.updateEvent(event)
+                    }
                 }
             ) {
                 Icon(

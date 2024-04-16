@@ -25,6 +25,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,34 +35,45 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.sodv3203_finalproject_group4.LoadImage
-import com.example.sodv3203_finalproject_group4.categoryMap
-import com.example.sodv3203_finalproject_group4.events
 import com.example.sodv3203_finalproject_group4.model.Event
 import com.example.sodv3203_finalproject_group4.model.EventStatus
+import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import com.example.sodv3203_finalproject_group4.users
-import kotlin.math.ceil
 
 @Composable
-fun HistoryScreen(navController: NavHostController, userId:Int) {
-    val filteredEventList = events.filter { it.status != EventStatus.Available  && it.joinedUsers.contains(userId) }
+fun HistoryScreen(navController: NavHostController, userId:Int, viewModel: EventViewModel) {
+    //val filteredEventList = events.filter { it.status != EventStatus.Available  && it.joinedUsers.contains(userId) }
+    val events by viewModel.getAllEvents().collectAsState(initial = emptyList())
+    val filteredEventList = events.filter { event ->
+        event.status != EventStatus.Available && event.joinedUsers.contains(userId)
+    }
+    val categories by viewModel.getAllEventCategories().collectAsState(initial = emptyList())
+    val categoryMap = categories.associate { it.categoryId to it.categoryName }
+    val users by viewModel.getAllUsers().collectAsState(initial = emptyList())
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        HistoryList(filteredEventList, navController, userId)
+        HistoryList(filteredEventList, navController, userId, users, categoryMap)
     }
 }
 
 @Composable
-fun HistoryList(eventList: List<Event>, navController: NavHostController, userId:Int) {
+fun HistoryList(
+    eventList: List<Event>,
+    navController: NavHostController,
+    userId:Int,
+    users: List<User>,
+    categoryMap: Map<Int, String>
+) {
     LazyColumn {
         items(eventList) { event ->
-            HistoryListItem(event = event, navController, userId)
+            HistoryListItem(event = event, navController, userId, users, categoryMap)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -76,7 +89,13 @@ fun HistoryList(eventList: List<Event>, navController: NavHostController, userId
 }
 
 @Composable
-fun HistoryListItem(event: Event, navController: NavHostController, userId:Int) {
+fun HistoryListItem(
+    event: Event,
+    navController: NavHostController,
+    userId:Int,
+    users: List<User>,
+    categoryMap: Map<Int, String>
+) {
     val categoryName = categoryMap[event.categoryId]
 
     Row(
@@ -194,6 +213,6 @@ private fun ButtonColors(status: EventStatus): ButtonColors {
 fun HistoryScreenPreview() {
     ShoppingBuddyAppTheme {
         val navController = rememberNavController()
-        HistoryScreen(navController, 2)
+        HistoryScreen(navController, 2, viewModel = viewModel())
     }
 }

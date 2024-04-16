@@ -1,6 +1,5 @@
 package com.example.sodv3203_finalproject_group4
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -12,12 +11,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.sodv3203_finalproject_group4.data.EventDataSource
-import com.example.sodv3203_finalproject_group4.model.Event
-import com.example.sodv3203_finalproject_group4.model.EventCategory
-import com.example.sodv3203_finalproject_group4.model.User
 import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
 
+/*
 lateinit var events: MutableList<Event>
 lateinit var categories: List<EventCategory>
 lateinit var users: MutableList<User>
@@ -29,6 +25,7 @@ fun loadEventData(context: Context) {
     users = EventDataSource.loadUsers(context).toMutableList()
     categoryMap = categories.associate { it.categoryId to it.categoryName }
 }
+*/
 
 class MainActivity : ComponentActivity() {
 
@@ -37,7 +34,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", ""+applicationContext)
-        loadEventData(applicationContext)
+        //loadEventData(applicationContext)
 
         setContent {
             val isSystemInDarkMode = isSystemInDarkTheme()

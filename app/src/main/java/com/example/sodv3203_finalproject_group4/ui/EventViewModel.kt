@@ -32,6 +32,10 @@ class EventViewModel(
         return shoppingBuddyRepository.getAllEvents()
     }
 
+    fun getEventById(eventId: Int): Flow<Event?> {
+        return shoppingBuddyRepository.getEvent(eventId)
+    }
+
     suspend fun addAllEvents(events: MutableList<Event>) {
         events.forEach { shoppingBuddyRepository.insertEvent(it) }
     }
@@ -43,6 +47,10 @@ class EventViewModel(
 
     suspend fun addAllUsers(users: MutableList<User>) {
         users.forEach { shoppingBuddyRepository.insertUser(it) }
+    }
+
+    fun getAllUsers(): Flow<List<User>> {
+        return shoppingBuddyRepository.getAllUsers()
     }
 
     suspend fun getUserById(userid: Int): Flow<User?> {
@@ -57,31 +65,6 @@ class EventViewModel(
         return shoppingBuddyRepository.insertUser(user)
     }
 
-
-    /*
-    fun fetchEvents() {
-        _eventUiState.value = EventUiState(isLoading = true)
-        val eventsResult = EventDataSource.loadEvents(context)
-        if (eventsResult.isNotEmpty()) {
-            _eventUiState.value = EventUiState(events = eventsResult)
-        } else {
-            _eventUiState.value = EventUiState(error = "Failed to fetch events")
-        }
-    }
-
-    fun onEventSelected(eventId: Int) {
-        _eventUiState.update { currentState ->
-            currentState.copy(currentEventIndex = eventId)
-        }
-    }
-
-    fun joinEvent(eventId: Int, userId: Int) {
-        val updatedUiState = _eventUiState.value.copy(
-            joinedEventIds = _eventUiState.value.joinedEventIds + eventId
-        )
-        _eventUiState.value = updatedUiState
-    }
-    */
     suspend fun updateUserProfile(user: User) {
         shoppingBuddyRepository.updateUser(user)
     }
@@ -103,6 +86,10 @@ class EventViewModel(
             password = password
         )
         shoppingBuddyRepository.updateUser(user)
+    }
+
+    suspend fun updateEvent(event: Event) {
+        shoppingBuddyRepository.updateEvent(event)
     }
 }
 

@@ -14,44 +14,52 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sodv3203_finalproject_group4.LoadImage
-import com.example.sodv3203_finalproject_group4.R
-import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
-import java.text.SimpleDateFormat
-import java.util.Locale
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.material.AlertDialog
-import com.example.sodv3203_finalproject_group4.categories
-import com.example.sodv3203_finalproject_group4.categoryMap
-import com.example.sodv3203_finalproject_group4.data.EventDataSource
-import com.example.sodv3203_finalproject_group4.events
-import com.example.sodv3203_finalproject_group4.model.EventStatus
-import com.example.sodv3203_finalproject_group4.users
-import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.sodv3203_finalproject_group4.LoadImage
+import com.example.sodv3203_finalproject_group4.R
+import com.example.sodv3203_finalproject_group4.model.EventStatus
+import com.example.sodv3203_finalproject_group4.ui.theme.ShoppingBuddyAppTheme
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
-    val event = remember { events.firstOrNull { it.eventId == eventId } }
+fun EventScreen(navController: NavHostController, userId: Int, eventId: Int, viewModel: EventViewModel) {
+    val events by viewModel.getAllEvents().collectAsState(initial = emptyList())
+    val categories by viewModel.getAllEventCategories().collectAsState(initial = emptyList())
+    val categoryMap = categories.associate { it.categoryId to it.categoryName }
+    val users by viewModel.getAllUsers().collectAsState(initial = emptyList())
+
+    //val event = remember { events.firstOrNull { it.eventId == eventId } }
+    val event = events.firstOrNull() { event -> event.eventId == eventId }
+
     val user = remember { users.firstOrNull { it.userId == userId } }
     var showDialog by remember { mutableStateOf(false) }
     val eventStatus = remember { mutableStateOf(EventStatus.Available) }
     var expanded by remember { mutableStateOf(false) }
     var selectedStatus by remember { mutableStateOf(EventStatus.Available) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     if (event != null) {
         val joinedUsers =
@@ -103,7 +111,8 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                         onCategorySelected = { /* Not applicable for EventScreen */ },
                         fromEvent = event,
                         selectedCategoryId = event.categoryId,
-                        categoryMap = categoryMap
+                        categoryMap = categoryMap,
+                        categories = categories
                     )
                 }
             }
@@ -220,17 +229,21 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                 item {
                     Button(
                         onClick = {
-                            showDialog = true
-                            val updatedEvent = event.copy(
-                                joinedUsers = event.joinedUsers + userId,
-                                status = if (event.joinedUsers.size + 1 == event.currHeadCount) {
-                                    EventStatus.Joined
-                                } else {
-                                    event.status
-                                }
-                            )
                             // Update the event with the new list of joined users and updated status
-                            EventDataSource.updateEventList(updatedEvent)
+                            //EventDataSource.updateEventList(updatedEvent)
+                            coroutineScope.launch {
+                                showDialog = true
+                                val updatedEvent = event.copy(
+                                    joinedUsers = event.joinedUsers + userId,
+                                    status = if (event.joinedUsers.size + 1 == event.currHeadCount) {
+                                        EventStatus.Joined
+                                    } else {
+                                        event.status
+                                    }
+                                )
+
+                                viewModel.updateEvent(updatedEvent)
+                            }
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -239,7 +252,8 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                 }
             }
 
-            if (EventDataSource.isEventOwner(userId, eventId)&& event.status == EventStatus.Available) {
+            //if (EventDataSource.isEventOwner(userId, eventId)&& event.status == EventStatus.Available) {
+            if ((event?.eventBy?.toIntOrNull() == userId) && event.status == EventStatus.Available) {
                 item {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -259,13 +273,19 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                                     .forEach { status ->
                                     Button(
                                         onClick = {
-                                            selectedStatus = status
-                                            expanded = false
-                                            // Update the event status here only if the selected status is not "Available"
-                                            if (selectedStatus != EventStatus.Available) {
-                                                EventDataSource.updateEventStatus(eventId, selectedStatus)
-                                                // Navigate to the history page
-                                                navController.navigate("history/$userId")
+                                            coroutineScope.launch {
+                                                selectedStatus = status
+                                                expanded = false
+                                                // Update the event status here only if the selected status is not "Available"
+                                                if (selectedStatus != EventStatus.Available) {
+                                                    //EventDataSource.updateEventStatus(eventId, selectedStatus)
+                                                    val updatedEvent = event.copy(
+                                                        status = selectedStatus
+                                                    )
+                                                    viewModel.updateEvent(updatedEvent)
+                                                    // Navigate to the history page
+                                                    navController.navigate("history/$userId")
+                                                }
                                             }
                                         },
                                         modifier = Modifier.fillMaxWidth()
@@ -278,31 +298,28 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
                     }
                 }
             }
-
         }
     }
 
-
-
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { showDialog = false },
-                title = { Text(text = "Success") },
-                text = { Text(text = "The event is joined.") },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            showDialog = false
-                            // navController.navigate("home/$userId")
-                            navController.popBackStack()
-                        }
-                    ) {
-                        Text(text = "OK")
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = "Success") },
+            text = { Text(text = "The event is joined.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDialog = false
+                        // navController.navigate("home/$userId")
+                        navController.popBackStack()
                     }
+                ) {
+                    Text(text = "OK")
                 }
-            )
-        }
+            }
+        )
     }
+}
 
 
 
@@ -312,6 +329,6 @@ fun EventScreen(navController: NavHostController, userId: Int, eventId: Int) {
 fun EventScreenPreview() {
     ShoppingBuddyAppTheme {
         val navController = rememberNavController()
-        EventScreen(navController,2, 4,)
+        EventScreen(navController,2, 4, viewModel = viewModel())
     }
 }
